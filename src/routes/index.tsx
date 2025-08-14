@@ -22,6 +22,7 @@ import { ResetPasswordPage } from '../pages/auth/ResetPasswordPage';
 import { UpdatePasswordPage } from '../pages/auth/UpdatePasswordPage';
 import { ForgotPasswordResetPage } from '../pages/auth/ForgotPasswordResetPage';
 import App from '../App';
+import NotFound from '../pages/NotFound';
 import { MasterIslandProvider } from '../contexts/MasterIslandContext';
 
 export const router = createBrowserRouter([
@@ -209,6 +210,12 @@ export const router = createBrowserRouter([
                 <PropertyForm businessMode />
               </AuthGuard>
             ),
+          },
+
+          // Catch-all route for 404s
+          {
+            path: '*',
+            element: <NotFound />,
           },
         ],
       },

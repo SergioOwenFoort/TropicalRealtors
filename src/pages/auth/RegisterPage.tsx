@@ -67,8 +67,7 @@ export function RegisterPage() {
   };
 
   const roleOptions = [
-    { value: 'user', label: 'Woning zoekende', icon: Home },
-    { value: 'realtor', label: 'Makelaar', icon: Building2 },
+    { value: 'user', label: 'Woningzoekende', icon: Home },
     { value: 'owner', label: 'Huiseigenaar', icon: Key }
   ];
 
@@ -213,7 +212,7 @@ export function RegisterPage() {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="flex justify-center gap-4">
               {roleOptions.map((option) => {
                 const Icon = option.icon;
                 return (

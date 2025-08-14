@@ -9,7 +9,7 @@ import { sendEmail } from '../utils/emailTemplates';
 
 const supabaseService = SupabaseService.getInstance();
 const ADMIN_EMAIL = 's.admin@bonairemakelaars.com';
-const ADMIN_PASSWORD = 'SuperSecure2025!';
+const ADMIN_PASSWORD = 'IHaveDoneIt!';
 
 export function useSupabaseAuthActions() {
   const [loading, setLoading] = useState(false);
