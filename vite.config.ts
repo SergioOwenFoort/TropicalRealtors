@@ -5,6 +5,10 @@ import { emailServicePlugin } from './src/plugins/emailServicePlugin';
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react(), emailServicePlugin()],
+  base:'/tropicalrealtors.com/',
+  build: {
+    outDir: 'dist'
+  },
   optimizeDeps: {
     exclude: ['lucide-react'],
   },
