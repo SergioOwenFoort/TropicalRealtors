@@ -1,0 +1,4 @@
+title,price,address,city,country,category,description,images,type,size
+Modern Villa,450000,Kaya Grandi 10,Kralendijk,Bonaire,huizen,"Ruime moderne villa met zwembad.",https://example.com/image1.jpg|https://example.com/image2.jpg,koop,250
+Beach Apartment,350000,Boulevard 5,Kralendijk,Bonaire,appartementen,"Appartement aan het strand met zeezicht.",https://example.com/image3.jpg,koop,120
+Cozy Rental,1500,Kaya L.D. Gerharts 22,Kralendijk,Bonaire,huizen,"Knus huis te huur in het centrum.",https://example.com/image4.jpg,huur,80

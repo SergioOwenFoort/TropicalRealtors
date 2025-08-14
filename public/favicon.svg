@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+  <defs>
+    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#2563eb;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1d4ed8;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <path
+    fill="url(#gradient)"
+    d="M12 2L2 12h2v8h5v-5h6v5h5v-8h2L12 2z"
+  />
+  <circle
+    cx="12"
+    cy="12"
+    r="7"
+    fill="none"
+    stroke="#2563eb"
+    stroke-width="1.5"
+    stroke-dasharray="3,2"
+  />
+  <path
+    fill="#2563eb"
+    d="M12 7l1 1.732L15 9.5l-1 1.732.5 2h-5l.5-2-1-1.732L11 8.732z"
+  />
+</svg>
