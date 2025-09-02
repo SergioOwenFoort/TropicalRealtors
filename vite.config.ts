@@ -5,7 +5,7 @@ import { emailServicePlugin } from './src/plugins/emailServicePlugin';
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react(), emailServicePlugin()],
-  base:'/bonairemakelaars.com_8roa65/',
+  base: '/',
   build: {
     outDir: 'dist'
   },

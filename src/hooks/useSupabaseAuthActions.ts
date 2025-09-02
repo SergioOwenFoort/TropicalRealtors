@@ -8,8 +8,8 @@ import { useServiceRoleAdmin } from './useServiceRoleAdmin';
 import { sendEmail } from '../utils/emailTemplates';
 
 const supabaseService = SupabaseService.getInstance();
-const ADMIN_EMAIL = 's.admin@bonairemakelaars.com';
-const ADMIN_PASSWORD = 'IHaveDoneIt!';
+const ADMIN_EMAIL = import.meta.env.VITE_ADMIN_EMAIL;
+const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD;
 
 export function useSupabaseAuthActions() {
   const [loading, setLoading] = useState(false);

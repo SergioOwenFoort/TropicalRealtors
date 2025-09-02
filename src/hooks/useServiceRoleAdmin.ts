@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '../config/supabase.config';
 import { supabaseAdmin } from '../config/supabaseAdmin';
 
-const ADMIN_EMAIL = 's.admin@bonairemakelaars.com';
+const ADMIN_EMAIL = import.meta.env.VITE_ADMIN_EMAIL;
 const SESSION_KEY = 'adminSession';
 
 export const useServiceRoleAdmin = () => {
