@@ -20,6 +20,7 @@
     "react-dom": "^18.0.0",
     "react-hot-toast": "^2.5.2",
     "react-router-dom": "^6.0.0",
+    "resend": "^6.0.2",
     "save-dev": "^0.0.1-security",
     "xlsx": "^0.18.5",
     "zustand": "^5.0.7"

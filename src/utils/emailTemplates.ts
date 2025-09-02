@@ -168,7 +168,7 @@ export const emailTemplates = {
 
 // Email service configuration
 export const emailConfig = {
-  apiUrl: '/api/send-email', // Now uses same port as frontend
+  apiUrl: '/api/send-email', // Relative URL - will use same port as frontend
   healthUrl: '/api/health'
 };
 

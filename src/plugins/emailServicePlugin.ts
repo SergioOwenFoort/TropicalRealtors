@@ -23,7 +23,7 @@ export function emailServicePlugin(): Plugin {
 
               // Import Resend dynamically
               const { Resend } = await import('resend');
-              const resend = new Resend(process.env.RESEND_API_KEY || 're_7GxDxqAA_7Z952vTSQm9yALuqrv9R8SPo');
+              const resend = new Resend(process.env.VITE_RESEND_API_KEY || 're_7GxDxqAA_7Z952vTSQm9yALuqrv9R8SPo');
 
               console.log('📤 Sending email via Resend API...');
 
