@@ -265,6 +265,14 @@ export function RegisterPage() {
               <img src="https://www.google.com/favicon.ico" alt="Google" className="w-5 h-5" />
               Google
             </button>
+
+            {/* Google registration info message */}
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-center">
+              <p className="text-xs text-blue-700">
+                <strong>Let op:</strong> Wanneer je registreert met Google word je automatisch aangemeld als <strong>woningzoekende</strong>. 
+                Je kunt je rol later laten aanpassen voor je profiel.
+              </p>
+            </div>
           </div>
         </form>
       </div>
