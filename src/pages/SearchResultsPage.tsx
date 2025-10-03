@@ -10,6 +10,15 @@ export function SearchResultsPage() {
   const { results, loading, error } = useSearch();
   const { selectedIsland } = useIsland();
 
+  // Debug logging
+  console.log('🏝️ SearchResultsPage render:', {
+    selectedIsland,
+    resultsCount: results?.length || 0,
+    loading,
+    error,
+    searchParams: Object.fromEntries(searchParams.entries())
+  });
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [searchParams]);
@@ -46,7 +55,7 @@ export function SearchResultsPage() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {results.map((property) => (
-                <PropertyCard key={property.id} property={property} />
+                <PropertyCard key={`${selectedIsland}-${property.id}`} property={property} />
               ))}
             </div>
           )}

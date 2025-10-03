@@ -9,9 +9,10 @@ import { Toaster } from 'react-hot-toast';
 import { PropertyProvider } from '../../contexts/PropertyContext';
 import { useIsland } from '../../contexts/MasterIslandContext';
 import { LocationDetectionBanner } from './LocationDetectionBanner';
-import { LocationDetectionIndicator } from './LocationDetectionIndicator';
 import { HeroCarousel } from '../ui/HeroCarousel';
 import { SearchBar } from '../ui/SearchBar';
+import { Breadcrumb } from '../ui/Breadcrumb';
+import { MobileDebugInfo } from '../debug/MobileDebugInfo';
 
 export function Layout() {
   const { selectedIsland } = useIsland();
@@ -40,13 +41,15 @@ export function Layout() {
       <div className="min-h-screen bg-gray-50">
         {renderMenu()}
         <LocationDetectionBanner />
-        <LocationDetectionIndicator />
         <HeroCarousel />
         {/* SearchBar below the carousel, visible on every page */}
         <div className="py-6 flex justify-center bg-white border-b border-gray-100">
           <SearchBar />
         </div>
+        {/* Breadcrumb navigation */}
+        <Breadcrumb />
         <Outlet />
+        <MobileDebugInfo />
         <Toaster position="top-right" />
       </div>
     </PropertyProvider>

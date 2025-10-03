@@ -4,6 +4,7 @@ import { Property } from '../types';
 import { CarouselSlide } from '../types';
 import { mapDbToProperty } from '../services/propertyService';
 import { detectUserIsland } from '../utils/locationDetection';
+import { MOCK_LISTINGS } from '../data/mockProperties';
 
 // Define the island type
 type Island = 'aruba' | 'bonaire' | 'curacao' | 'saba' | 'sint-eustatius' | 'sint-maarten';
@@ -86,7 +87,7 @@ const ISLAND_CONFIGS = {
     language: 'nl',
     contactInfo: {
       phone: '+599 717 1234',
-      email: 'info@bonairemakelaars.com',
+      email: 'info@tropicalrealtors.com',
       address: 'Kralendijk, Bonaire'
     }
   },
@@ -228,26 +229,33 @@ export function MasterIslandProvider({ children }: { children: React.ReactNode }
 
   // Fetch all data for a specific island
   const fetchIslandData = useCallback(async (island: Island, forceRefresh = false) => {
+    console.log('🏝️ fetchIslandData called for:', island, 'forceRefresh:', forceRefresh);
     const now = Date.now();
     const lastFetch = lastFetchTimes.get(island) || 0;
     const cached = islandDataCache.get(island);
     
     // Use cache if available and not expired
     if (!forceRefresh && cached && (now - lastFetch) < CACHE_DURATION) {
-            setIslandData(prev => ({
-                ...prev,
-                ...cached,
-                config: ISLAND_CONFIGS[island],
-                locations: [...ISLAND_LOCATIONS[island]],
-                menuItems: {
-                  koop: [...ISLAND_MENUS[island].koop],
-                  huur: [...ISLAND_MENUS[island].huur],
-                  informatie: [...ISLAND_MENUS[island].informatie]
-                },
-                loading: { properties: false, realtors: false, carousel: false, all: false }
-            }));
+      console.log('🏝️ Using cached data for:', island);
+      setIslandData(() => ({
+        properties: [...(cached.properties || [])],
+        featuredProperties: [...(cached.featuredProperties || [])],
+        realtors: [...(cached.realtors || [])],
+        carouselSlides: [...(cached.carouselSlides || [])],
+        locations: [...ISLAND_LOCATIONS[island]],
+        menuItems: {
+          koop: [...ISLAND_MENUS[island].koop],
+          huur: [...ISLAND_MENUS[island].huur],
+          informatie: [...ISLAND_MENUS[island].informatie]
+        },
+        config: { ...ISLAND_CONFIGS[island] },
+        loading: { properties: false, realtors: false, carousel: false, all: false },
+        errors: { properties: null, realtors: null, carousel: null }
+      }));
       return;
     }
+
+    console.log('🏝️ Fetching fresh data for:', island);
 
     // Set loading states
     setIslandData(prev => ({
@@ -289,12 +297,20 @@ export function MasterIslandProvider({ children }: { children: React.ReactNode }
       let featuredProperties: Property[] = [];
       let propertiesError: string | null = null;
 
-      if (propertiesResult.status === 'fulfilled' && propertiesResult.value.data) {
+      if (propertiesResult.status === 'fulfilled' && propertiesResult.value.data && propertiesResult.value.data.length > 0) {
         properties = propertiesResult.value.data.map(mapDbToProperty);
         featuredProperties = properties.filter(p => p.featured);
-      } else if (propertiesResult.status === 'rejected') {
-        propertiesError = 'Failed to load properties';
-        console.error('Properties fetch error:', propertiesResult.reason);
+      } else {
+        // Use mock properties as fallback when no database properties found
+        const countryName = getIslandCountryName(island);
+        const mockProps = MOCK_LISTINGS.filter(prop => prop.country === countryName);
+        properties = mockProps;
+        featuredProperties = mockProps.filter(p => p.featured);
+        
+        // Only set error if both database fetch failed AND no mock properties are available
+        if (propertiesResult.status === 'rejected' && mockProps.length === 0) {
+          propertiesError = 'Failed to load properties';
+        }
       }
 
       // Process realtors
@@ -305,7 +321,6 @@ export function MasterIslandProvider({ children }: { children: React.ReactNode }
         realtors = realtorsResult.value.data;
       } else if (realtorsResult.status === 'rejected') {
         realtorsError = 'Failed to load realtors';
-        console.error('Realtors fetch error:', realtorsResult.reason);
       }
 
       // Process carousel
@@ -345,7 +360,6 @@ export function MasterIslandProvider({ children }: { children: React.ReactNode }
         }
       } else if (carouselResult.status === 'rejected') {
         carouselError = 'Failed to load carousel';
-        console.error('Carousel fetch error:', carouselResult.reason);
         
         // Even on error, create 8 placeholder slides (only for supported carousel islands)
         const carouselSupportedIslands: ('bonaire' | 'aruba' | 'curacao' | 'saba' | 'sint-eustatius')[] = 
@@ -373,23 +387,6 @@ export function MasterIslandProvider({ children }: { children: React.ReactNode }
         }
       }
 
-      // Create the complete island data
-      const completeIslandData: IslandData = {
-        properties,
-        featuredProperties,
-        realtors,
-        carouselSlides,
-        locations: [...ISLAND_LOCATIONS[island]],
-        menuItems: {
-          koop: [...ISLAND_MENUS[island].koop],
-          huur: [...ISLAND_MENUS[island].huur],
-          informatie: [...ISLAND_MENUS[island].informatie]
-        },
-        config: ISLAND_CONFIGS[island],
-        loading: { properties: false, realtors: false, carousel: false, all: false },
-        errors: { properties: propertiesError, realtors: realtorsError, carousel: carouselError }
-      };
-
       // Cache the data
       islandDataCache.set(island, {
         properties,
@@ -399,8 +396,23 @@ export function MasterIslandProvider({ children }: { children: React.ReactNode }
       });
       lastFetchTimes.set(island, now);
 
-      // Update state
-      setIslandData(completeIslandData);
+      // Update state with a completely new object reference to ensure re-renders
+      console.log('🏝️ Setting island data for:', island, 'properties:', properties.length, 'featured:', featuredProperties.length);
+      setIslandData(() => ({
+        properties: [...properties],
+        featuredProperties: [...featuredProperties],
+        realtors: [...realtors],
+        carouselSlides: [...carouselSlides],
+        locations: [...ISLAND_LOCATIONS[island]],
+        menuItems: {
+          koop: [...ISLAND_MENUS[island].koop],
+          huur: [...ISLAND_MENUS[island].huur],
+          informatie: [...ISLAND_MENUS[island].informatie]
+        },
+        config: { ...ISLAND_CONFIGS[island] },
+        loading: { properties: false, realtors: false, carousel: false, all: false },
+        errors: { properties: propertiesError, realtors: realtorsError, carousel: carouselError }
+      }));
 
     } catch (error) {
       console.error('Failed to fetch island data:', error);
@@ -423,6 +435,21 @@ export function MasterIslandProvider({ children }: { children: React.ReactNode }
       const wasAutoDetected = localStorage.getItem('islandAutoDetected') === 'true';
       const hasManualSelection = savedIsland && !wasAutoDetected;
       
+      // Check if location was already detected today (cache check)
+      const locationCache = localStorage.getItem('tropicalrealtors_location_cache');
+      if (locationCache) {
+        try {
+          const cache = JSON.parse(locationCache);
+          const cacheAge = Date.now() - cache.timestamp;
+          const dayInMs = 24 * 60 * 60 * 1000;
+          if (cacheAge < dayInMs) {
+            return false;
+          }
+        } catch (error) {
+          console.warn('Error checking location cache:', error);
+        }
+      }
+      
       // Only auto-detect if user hasn't manually selected an island
       return !hasManualSelection;
     };
@@ -434,7 +461,6 @@ export function MasterIslandProvider({ children }: { children: React.ReactNode }
           setSelectedIsland(detectedIsland);
           localStorage.setItem('selectedIsland', detectedIsland);
           localStorage.setItem('islandAutoDetected', 'true');
-          console.log(`Auto-detected island: ${detectedIsland}`);
           fetchIslandData(detectedIsland);
         })
         .catch((error) => {
@@ -442,19 +468,32 @@ export function MasterIslandProvider({ children }: { children: React.ReactNode }
           fetchIslandData(selectedIsland);
         });
     } else {
-      // User has manual selection, just load the data
+      // User has manual selection or already detected today, just load the data
       fetchIslandData(selectedIsland);
     }
   }, []);
 
   // Switch to a different island
   const switchIsland = useCallback((island: Island) => {
+    console.log('🏝️ switchIsland called:', island, 'current:', selectedIsland);
     if (island !== selectedIsland) {
+      console.log('🏝️ Actually switching island from', selectedIsland, 'to', island);
+      
+      // Clear cache for this island to ensure fresh data
+      islandDataCache.delete(island);
+      lastFetchTimes.delete(island);
+      
       setSelectedIsland(island);
       // Mark as manual selection
       localStorage.setItem('selectedIsland', island);
       localStorage.setItem('islandAutoDetected', 'false');
-      fetchIslandData(island);
+      
+      // Force refresh the data
+      fetchIslandData(island, true);
+    } else {
+      console.log('🏝️ Island is already selected, forcing refresh anyway for mobile compatibility');
+      // Force refresh even if same island (mobile compatibility)
+      fetchIslandData(island, true);
     }
   }, [selectedIsland, fetchIslandData]);
 
@@ -511,12 +550,15 @@ export function useMasterIsland() {
 // Convenience hooks for specific data
 export function useIslandProperties() {
   const { islandData } = useMasterIsland();
-  return {
+  console.log('🏝️ useIslandProperties called, properties:', islandData.properties.length, 'featured:', islandData.featuredProperties.length);
+  
+  // Use useMemo to ensure stable references but trigger re-renders when data changes
+  return useMemo(() => ({
     properties: islandData.properties,
     featuredProperties: islandData.featuredProperties,
     loading: islandData.loading.properties,
     error: islandData.errors.properties
-  };
+  }), [islandData.properties, islandData.featuredProperties, islandData.loading.properties, islandData.errors.properties]);
 }
 
 export function useIslandRealtors() {
