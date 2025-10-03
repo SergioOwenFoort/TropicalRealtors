@@ -19,6 +19,11 @@ export interface Database {
           created_at: string
           updated_at: string | null
           favorites: string[]
+          first_name: string | null
+          last_name: string | null
+          phone: string | null
+          address: string | null
+          country_of_residence: string | null
         }
         Insert: {
           id: string
@@ -29,6 +34,11 @@ export interface Database {
           created_at?: string
           updated_at?: string | null
           favorites?: string[]
+          first_name?: string | null
+          last_name?: string | null
+          phone?: string | null
+          address?: string | null
+          country_of_residence?: string | null
         }
         Update: {
           id?: string
@@ -39,6 +49,11 @@ export interface Database {
           created_at?: string
           updated_at?: string | null
           favorites?: string[]
+          first_name?: string | null
+          last_name?: string | null
+          phone?: string | null
+          address?: string | null
+          country_of_residence?: string | null
         }
       }
       properties: {

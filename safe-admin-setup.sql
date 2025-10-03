@@ -74,10 +74,10 @@ GRANT EXECUTE ON FUNCTION check_admin_credentials(text, text) TO authenticated;
 SELECT 'Admin credential function created successfully!' as status;
 
 -- Step 2: Check if admin user already exists
--- REPLACE 's.admin@bonairemakelaars.com' with your VITE_ADMIN_EMAIL
+-- REPLACE 's.admin@tropicalrealtors.com' with your VITE_ADMIN_EMAIL
 DO $$
 DECLARE
-    admin_email TEXT := 's.admin@bonairemakelaars.com'; -- REPLACE with your VITE_ADMIN_EMAIL
+    admin_email TEXT := 's.admin@tropicalrealtors.com'; -- REPLACE with your VITE_ADMIN_EMAIL
     admin_password TEXT := 'SuperSecure2025!'; -- REPLACE with your VITE_ADMIN_PASSWORD
     user_id UUID;
     existing_user_id UUID;
@@ -149,7 +149,7 @@ END $$;
 -- Step 3: Test the setup
 SELECT 'Testing admin credential function:' as test_info;
 -- REPLACE email and password with your actual credentials
-SELECT check_admin_credentials('s.admin@bonairemakelaars.com', 'SuperSecure2025!') as test_result;
+SELECT check_admin_credentials('s.admin@tropicalrealtors.com', 'SuperSecure2025!') as test_result;
 
 -- Step 4: Verify the setup
 SELECT 'SETUP VERIFICATION:' as result;
@@ -161,7 +161,7 @@ SELECT 'Auth User:' as info,
        CASE WHEN encrypted_password IS NOT NULL THEN 'Password Set' ELSE 'No Password' END as password_status,
        raw_app_meta_data
 FROM auth.users 
-WHERE email = 's.admin@bonairemakelaars.com'; -- REPLACE with your VITE_ADMIN_EMAIL
+WHERE email = 's.admin@tropicalrealtors.com'; -- REPLACE with your VITE_ADMIN_EMAIL
 
 -- Check profile
 SELECT 'Profile:' as info,
@@ -170,6 +170,6 @@ SELECT 'Profile:' as info,
        role,
        display_name
 FROM public.profiles 
-WHERE email = 's.admin@bonairemakelaars.com'; -- REPLACE with your VITE_ADMIN_EMAIL
+WHERE email = 's.admin@tropicalrealtors.com'; -- REPLACE with your VITE_ADMIN_EMAIL
 
 SELECT 'SAFE ADMIN SETUP COMPLETE!' as final_status;

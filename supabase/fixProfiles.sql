@@ -83,16 +83,16 @@ BEGIN
   -- Ensure the admin user has the admin role
   UPDATE profiles 
   SET role = 'admin' 
-  WHERE email = 's.admin@bonairemakelaars.com' AND role IS DISTINCT FROM 'admin';
+  WHERE email = 's.admin@tropicalrealtors.com' AND role IS DISTINCT FROM 'admin';
   
   -- Ensure admin has a profile
   INSERT INTO profiles (id, email, role, display_name)
   SELECT id, email, 'admin', 'Admin User'
   FROM auth.users
-  WHERE email = 's.admin@bonairemakelaars.com'
+  WHERE email = 's.admin@tropicalrealtors.com'
   AND NOT EXISTS (
     SELECT 1 FROM profiles 
-    WHERE email = 's.admin@bonairemakelaars.com'
+    WHERE email = 's.admin@tropicalrealtors.com'
   );
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;

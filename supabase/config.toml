@@ -175,8 +175,8 @@ host = "smtp.resend.com"
 port = 587
 user = "resend"
 pass = "env(VITE_RESEND_API_KEY)"
-admin_email = "admin@bonairemakelaars.com"
-sender_name = "Bonaire Makelaars"
+admin_email = "admin@tropicalrealtors.com"
+sender_name = "Tropical Realtors"
 
 # Uncomment to customize email template
 # [auth.email.template.invite]

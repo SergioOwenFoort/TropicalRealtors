@@ -61,7 +61,7 @@ export function useDashboardRoute(): DashboardRoute {
           console.log('Detected policy recursion error, checking email for admin fallback...');
           
           // Special case for admin email
-          if (user.email === 's.admin@bonairemakelaars.com') {
+          if (user.email === 's.admin@tropicalrealtors.com') {
             console.log('Admin email detected, redirecting to admin dashboard');
             setPath('/admin');
             setError(null);

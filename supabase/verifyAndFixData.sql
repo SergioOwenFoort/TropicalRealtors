@@ -1,7 +1,7 @@
 -- Get admin user ID
 SELECT id, email 
 FROM auth.users 
-WHERE email = 's.foort@bonairemakelaars.com';
+WHERE email = 's.foort@tropicalrealtors.com';
 
 -- Check if properties were actually inserted
 SELECT COUNT(*) FROM public.properties;

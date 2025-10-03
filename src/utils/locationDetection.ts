@@ -2,6 +2,22 @@
 
 type Island = 'bonaire' | 'aruba' | 'curacao' | 'saba' | 'sint-eustatius' | 'sint-maarten';
 
+// Cache configuration
+const LOCATION_CACHE_KEY = 'tropicalrealtors_location_cache';
+const CACHE_DURATION_MS = 24 * 60 * 60 * 1000; // 24 hours
+
+interface LocationCache {
+  island: Island;
+  detectedCountry?: string;
+  detectionMethod: 'browser' | 'ip' | 'default';
+  timestamp: number;
+  reason: string;
+}
+
+// Detection state to prevent multiple simultaneous detections
+let isDetecting = false;
+let detectionPromise: Promise<Island> | null = null;
+
 // Mapping of country codes and regions to islands
 const LOCATION_TO_ISLAND_MAP: Record<string, Island> = {
   // Direct matches for the islands themselves
@@ -145,22 +161,70 @@ async function detectCountryFromIP(): Promise<string | null> {
   }
 }
 
-// Main function to detect user's location and return appropriate island
-export async function detectUserIsland(): Promise<Island> {
+// Cache utility functions
+function getLocationFromCache(): LocationCache | null {
+  try {
+    const cached = localStorage.getItem(LOCATION_CACHE_KEY);
+    if (!cached) return null;
+    
+    const locationCache: LocationCache = JSON.parse(cached);
+    
+    // Check if cache is still valid (within 24 hours)
+    if (Date.now() - locationCache.timestamp < CACHE_DURATION_MS) {
+      console.log(`Using cached location: ${locationCache.island} (${locationCache.reason})`);
+      return locationCache;
+    } else {
+      // Cache expired, remove it
+      localStorage.removeItem(LOCATION_CACHE_KEY);
+      console.log('Location cache expired, will re-detect');
+      return null;
+    }
+  } catch (error) {
+    console.warn('Error reading location cache:', error);
+    localStorage.removeItem(LOCATION_CACHE_KEY);
+    return null;
+  }
+}
+
+function saveLocationToCache(
+  island: Island, 
+  detectedCountry?: string, 
+  detectionMethod: 'browser' | 'ip' | 'default' = 'default',
+  reason = 'Automatic detection'
+): void {
+  try {
+    const locationCache: LocationCache = {
+      island,
+      detectedCountry,
+      detectionMethod,
+      timestamp: Date.now(),
+      reason
+    };
+    localStorage.setItem(LOCATION_CACHE_KEY, JSON.stringify(locationCache));
+    console.log(`Location cached: ${island} (method: ${detectionMethod})`);
+  } catch (error) {
+    console.warn('Error saving location to cache:', error);
+  }
+}
+
+// Internal detection function (without cache)
+async function performLocationDetection(): Promise<{ island: Island; country?: string; method: 'browser' | 'ip' | 'default' }> {
   // 1. First try browser-based detection (fastest, most privacy-friendly)
   const browserCountry = detectCountryFromBrowser() || detectCountryFromLanguage();
   
   if (browserCountry && LOCATION_TO_ISLAND_MAP[browserCountry]) {
-    console.log(`Island detected from browser: ${LOCATION_TO_ISLAND_MAP[browserCountry]} (${browserCountry})`);
-    return LOCATION_TO_ISLAND_MAP[browserCountry];
+    const island = LOCATION_TO_ISLAND_MAP[browserCountry];
+    console.log(`Island detected from browser: ${island} (${browserCountry})`);
+    return { island, country: browserCountry, method: 'browser' };
   }
   
   // 2. Try IP-based geolocation as fallback
   try {
     const ipCountry = await detectCountryFromIP();
     if (ipCountry && LOCATION_TO_ISLAND_MAP[ipCountry]) {
-      console.log(`Island detected from IP: ${LOCATION_TO_ISLAND_MAP[ipCountry]} (${ipCountry})`);
-      return LOCATION_TO_ISLAND_MAP[ipCountry];
+      const island = LOCATION_TO_ISLAND_MAP[ipCountry];
+      console.log(`Island detected from IP: ${island} (${ipCountry})`);
+      return { island, country: ipCountry, method: 'ip' };
     }
   } catch (error) {
     console.warn('IP geolocation failed:', error);
@@ -168,7 +232,45 @@ export async function detectUserIsland(): Promise<Island> {
   
   // 3. Default to Bonaire if no detection worked
   console.log('No location detected, defaulting to Bonaire');
-  return 'bonaire';
+  return { island: 'bonaire', method: 'default' };
+}
+
+// Main function to detect user's location and return appropriate island
+export async function detectUserIsland(): Promise<Island> {
+  // Check cache first
+  const cached = getLocationFromCache();
+  if (cached) {
+    return cached.island;
+  }
+  
+  // If already detecting, return the existing promise
+  if (isDetecting && detectionPromise) {
+    console.log('Location detection already in progress, waiting...');
+    return detectionPromise;
+  }
+  
+  // Start new detection
+  isDetecting = true;
+  detectionPromise = (async () => {
+    try {
+      const result = await performLocationDetection();
+      
+      // Save to cache
+      saveLocationToCache(
+        result.island, 
+        result.country, 
+        result.method,
+        getIslandSelectionReason(result.island, result.country)
+      );
+      
+      return result.island;
+    } finally {
+      isDetecting = false;
+      detectionPromise = null;
+    }
+  })();
+  
+  return detectionPromise;
 }
 
 // Function to check if user is likely from one of our target islands

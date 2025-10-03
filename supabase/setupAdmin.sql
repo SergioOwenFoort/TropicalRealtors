@@ -6,7 +6,7 @@ SET search_path TO auth, public;
 
 DO $$
 DECLARE
-  v_email TEXT := 's.foort@bonairemakelaars.com';
+  v_email TEXT := 's.foort@tropicalrealtors.com';
   v_password TEXT := 'Admin@BonaireMakelaars2025!';
   v_user_id uuid;
   v_hash TEXT := '$2a$10$zHFcFEeGkA6TI9XtLQJ8wePUnyCU4RvRHHZMjedoz3vCTzgW03nzy';  -- Pre-generated bcrypt hash for Admin@BonaireMakelaars2025!

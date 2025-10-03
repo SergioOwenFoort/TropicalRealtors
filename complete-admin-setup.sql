@@ -79,23 +79,23 @@ SELECT 'Admin credential function created successfully!' as status;
 -- Delete in correct order to avoid foreign key constraint violations:
 -- 1. First delete properties created by this user
 DELETE FROM public.properties WHERE created_by IN (
-    SELECT id FROM auth.users WHERE email = 's.admin@bonairemakelaars.com'
+    SELECT id FROM auth.users WHERE email = 's.admin@tropicalrealtors.com'
 );
 
 -- 2. Delete any other related data that might reference the user
 DELETE FROM public.saved_searches WHERE user_id IN (
-    SELECT id FROM auth.users WHERE email = 's.admin@bonairemakelaars.com'
+    SELECT id FROM auth.users WHERE email = 's.admin@tropicalrealtors.com'
 );
 
 DELETE FROM public.favorites WHERE user_id IN (
-    SELECT id FROM auth.users WHERE email = 's.admin@bonairemakelaars.com'
+    SELECT id FROM auth.users WHERE email = 's.admin@tropicalrealtors.com'
 );
 
 -- 3. Delete the profile (child table)
-DELETE FROM public.profiles WHERE email = 's.admin@bonairemakelaars.com';
+DELETE FROM public.profiles WHERE email = 's.admin@tropicalrealtors.com';
 
 -- 4. Finally delete the user (parent table)
-DELETE FROM auth.users WHERE email = 's.admin@bonairemakelaars.com';
+DELETE FROM auth.users WHERE email = 's.admin@tropicalrealtors.com';
 
 -- Step 3: Create the admin user
 -- REPLACE the email and password below with your actual admin credentials
@@ -116,7 +116,7 @@ INSERT INTO auth.users (
     gen_random_uuid(),
     'authenticated',
     'authenticated',
-    's.admin@bonairemakelaars.com', -- REPLACE with your VITE_ADMIN_EMAIL
+    's.admin@tropicalrealtors.com', -- REPLACE with your VITE_ADMIN_EMAIL
     crypt('SuperSecure2025!', gen_salt('bf')), -- REPLACE with your VITE_ADMIN_PASSWORD
     now(),
     now(),
@@ -135,12 +135,12 @@ SELECT
     now(),
     now()
 FROM auth.users u 
-WHERE u.email = 's.admin@bonairemakelaars.com'; -- REPLACE with your VITE_ADMIN_EMAIL
+WHERE u.email = 's.admin@tropicalrealtors.com'; -- REPLACE with your VITE_ADMIN_EMAIL
 
 -- Step 5: Test the setup
 SELECT 'Testing admin credential function:' as test_info;
 -- REPLACE email and password with your actual credentials
-SELECT check_admin_credentials('s.admin@bonairemakelaars.com', 'SuperSecure2025!') as test_result;
+SELECT check_admin_credentials('s.admin@tropicalrealtors.com', 'SuperSecure2025!') as test_result;
 
 -- Step 6: Verify the setup
 SELECT 'SETUP VERIFICATION:' as result;
@@ -152,7 +152,7 @@ SELECT 'Auth User:' as info,
        CASE WHEN encrypted_password IS NOT NULL THEN 'Password Set' ELSE 'No Password' END as password_status,
        raw_app_meta_data
 FROM auth.users 
-WHERE email = 's.admin@bonairemakelaars.com'; -- REPLACE with your VITE_ADMIN_EMAIL
+WHERE email = 's.admin@tropicalrealtors.com'; -- REPLACE with your VITE_ADMIN_EMAIL
 
 -- Check profile
 SELECT 'Profile:' as info,
@@ -161,6 +161,6 @@ SELECT 'Profile:' as info,
        role,
        display_name
 FROM public.profiles 
-WHERE email = 's.admin@bonairemakelaars.com'; -- REPLACE with your VITE_ADMIN_EMAIL
+WHERE email = 's.admin@tropicalrealtors.com'; -- REPLACE with your VITE_ADMIN_EMAIL
 
 SELECT 'ADMIN SETUP COMPLETE!' as final_status;
