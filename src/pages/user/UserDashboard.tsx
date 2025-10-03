@@ -1,5 +1,6 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Heart, Bell, Trash2, User } from 'lucide-react';
+import { Heart, Bell, Trash2, User, MessageSquare, ChevronDown, ChevronUp } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { PropertyCard } from '../../components/ui/PropertyCard';
 import { useFavorites } from '../../hooks/useFavorites';
@@ -7,12 +8,14 @@ import { useProfile } from '../../hooks/useProfile';
 import { useSavedSearches } from '../../hooks/useSavedSearches';
 import { usePaginatedFavorites } from '../../hooks/usePaginatedFavorites';
 import { LoadingSpinner } from '../../components/LoadingSpinner';
+import { SimpleMessagesDashboard } from '../../components/messages/SimpleMessagesDashboard';
 
 export function UserDashboard() {
   const { user } = useAuth();
   const { profile, loading: profileLoading } = useProfile();
   const { favorites } = useFavorites();
   const { savedSearches, deleteSearch } = useSavedSearches();
+  const [isMessagesExpanded, setIsMessagesExpanded] = useState(false);
   const { 
     properties: favoriteProperties, 
     loading: favoritesLoading, 
@@ -79,6 +82,33 @@ export function UserDashboard() {
             </Link>
           </div>
         </div>
+      </div>
+
+      {/* Messages Section */}
+      <div className="bg-white p-6 rounded-lg shadow-sm mb-8">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-bold">Uw Berichten</h2>
+          <button
+            onClick={() => setIsMessagesExpanded(!isMessagesExpanded)}
+            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-md transition-colors"
+          >
+            <MessageSquare className="w-4 h-4" />
+            {isMessagesExpanded ? (
+              <>
+                <span>Verbergen</span>
+                <ChevronUp className="w-4 h-4" />
+              </>
+            ) : (
+              <>
+                <span>Bekijken</span>
+                <ChevronDown className="w-4 h-4" />
+              </>
+            )}
+          </button>
+        </div>
+        {isMessagesExpanded && (
+          <SimpleMessagesDashboard />
+        )}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
