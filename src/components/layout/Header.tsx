@@ -5,10 +5,14 @@ import { AuthMenu } from '../auth/AuthMenu';
 import { useAuth } from '../../hooks/useAuth';
 import { useUserRole } from '../../hooks/useUserRole';
 import { SearchBar } from '../ui/SearchBar';
+import { Breadcrumb } from '../ui/Breadcrumb';
+import { useUnreadMessages } from '../../hooks/useUnreadMessages';
+import { Logo } from '../ui/Logo';
 
 export function Header() {
   const { user } = useAuth();
   const { isAdmin, isRealtor } = useUserRole();
+  const { unreadCount } = useUnreadMessages();
   const [isAuthMenuOpen, setIsAuthMenuOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isInfoDropdownOpen, setIsInfoDropdownOpen] = useState(false);
@@ -25,13 +29,7 @@ export function Header() {
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between gap-8">
 
-            <Link to="/" className="flex items-center gap-3" onClick={closeAllMenus}>
-              {/* Removed the logo image */}
-              <div>
-                <span className="text-xl font-bold text-gray-900">ABCMakelaars</span>
-                <span className="text-xl font-bold text-blue-600">.com</span>
-              </div>
-            </Link>
+            <Logo onClick={closeAllMenus} />
 
             {/* SearchBar visible on every page */}
             <div className="flex-1 px-8 max-w-2xl">
@@ -79,15 +77,25 @@ export function Header() {
               {user && (
                 <>
                   {!isRealtor && (
-                    <Link to="/account" className="text-gray-600 hover:text-blue-600 flex items-center gap-2">
+                    <Link to="/account" className="text-gray-600 hover:text-blue-600 flex items-center gap-2 relative">
                       <LayoutDashboard className="w-5 h-5" />
                       <span>Dashboard</span>
+                      {unreadCount > 0 && (
+                        <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full min-w-[20px] h-5 flex items-center justify-center px-1">
+                          {unreadCount > 99 ? '99+' : unreadCount}
+                        </span>
+                      )}
                     </Link>
                   )}
                   {isRealtor && (
-                    <Link to="/makelaar" className="text-gray-600 hover:text-blue-600 flex items-center gap-2">
+                    <Link to="/makelaar" className="text-gray-600 hover:text-blue-600 flex items-center gap-2 relative">
                       <Building2 className="w-5 h-5" />
                       <span>Dashboard</span>
+                      {unreadCount > 0 && (
+                        <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full min-w-[20px] h-5 flex items-center justify-center px-1">
+                          {unreadCount > 99 ? '99+' : unreadCount}
+                        </span>
+                      )}
                     </Link>
                   )}
                   {isAdmin && (
@@ -196,21 +204,31 @@ export function Header() {
                   {!isRealtor && (
                     <Link
                       to="/account"
-                      className="flex items-center gap-2 py-2 text-gray-600"
+                      className="flex items-center gap-2 py-2 text-gray-600 relative"
                       onClick={() => setIsMobileMenuOpen(false)}
                     >
                       <LayoutDashboard className="w-5 h-5" />
                       <span>Dashboard</span>
+                      {unreadCount > 0 && (
+                        <span className="ml-2 bg-red-500 text-white text-xs rounded-full min-w-[20px] h-5 flex items-center justify-center px-1">
+                          {unreadCount > 99 ? '99+' : unreadCount}
+                        </span>
+                      )}
                     </Link>
                   )}
                   {isRealtor && (
                     <Link
                       to="/makelaar"
-                      className="flex items-center gap-2 py-2 text-gray-600"
+                      className="flex items-center gap-2 py-2 text-gray-600 relative"
                       onClick={() => setIsMobileMenuOpen(false)}
                     >
                       <Building2 className="w-5 h-5" />
                       <span>Dashboard</span>
+                      {unreadCount > 0 && (
+                        <span className="ml-2 bg-red-500 text-white text-xs rounded-full min-w-[20px] h-5 flex items-center justify-center px-1">
+                          {unreadCount > 99 ? '99+' : unreadCount}
+                        </span>
+                      )}
                     </Link>
                   )}
                   {isAdmin && (
@@ -229,6 +247,9 @@ export function Header() {
           </div>
         )}
       </header>
+
+      {/* Breadcrumb Navigation */}
+      <Breadcrumb />
 
       <AuthMenu isOpen={isAuthMenuOpen} onClose={() => setIsAuthMenuOpen(false)} />
     </>

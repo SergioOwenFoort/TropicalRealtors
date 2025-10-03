@@ -7,6 +7,7 @@ import { IslandSelector } from './IslandSelector';
 import { IslandMenu } from './IslandMenu';
 import { useAuth } from '../../hooks/useAuth';
 import { useUserRole } from '../../hooks/useUserRole';
+import { Logo } from '../ui/Logo';
 
 export function MenuAruba() {
   const { user } = useAuth();
@@ -74,14 +75,10 @@ export function MenuAruba() {
     <>
       <header className="bg-white shadow-sm relative z-50">
         <div className="max-w-7xl mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <Link to="/" className="flex items-center gap-3" onClick={closeAllMenus}>
-              {/* Removed the logo image */}
-              <div>
-                <span className="text-xl font-bold text-gray-900">ABCMakelaars</span>
-                <span className="text-xl font-bold text-blue-600">.com</span>
-              </div>
-            </Link>
+          <div className="flex items-center gap-8">
+            <div className="flex-1">
+              <Logo onClick={closeAllMenus} />
+            </div>
 
             <nav className="hidden md:flex items-center gap-8">
               {/* Island Selector */}

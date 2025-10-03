@@ -1,5 +1,6 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Heart, Bell, Trash2, User } from 'lucide-react';
+import { Heart, Bell, Trash2, User, MessageSquare, ChevronDown, ChevronUp } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { PropertyCard } from '../../components/ui/PropertyCard';
 import { useFavorites } from '../../hooks/useFavorites';
@@ -7,8 +8,9 @@ import { useProfile } from '../../hooks/useProfile';
 import { useSavedSearches } from '../../hooks/useSavedSearches';
 import { usePaginatedFavorites } from '../../hooks/usePaginatedFavorites';
 import { LoadingSpinner } from '../../components/LoadingSpinner';
+import { SimpleMessagesDashboard } from '../../components/messages/SimpleMessagesDashboard';
 
-export function UserDashboard() {
+export const UserDashboard = () => {
   const { user } = useAuth();
   const { profile, loading: profileLoading } = useProfile();
   const { favorites } = useFavorites();
@@ -19,6 +21,8 @@ export function UserDashboard() {
     hasMore, 
     loadMore 
   } = usePaginatedFavorites(6);
+  
+  const [isMessagesExpanded, setIsMessagesExpanded] = useState(false);
 
   if (profileLoading || favoritesLoading) {
     return (
@@ -35,7 +39,7 @@ export function UserDashboard() {
         <p className="text-gray-600">Beheer uw favorieten en bezichtigingsaanvragen</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
         <div className="bg-white p-6 rounded-lg shadow-sm">
           <div className="flex items-center gap-4">
             <div className="p-3 bg-red-100 text-red-600 rounded-lg">
@@ -54,118 +58,146 @@ export function UserDashboard() {
               <Bell className="w-6 h-6" />
             </div>
             <div>
-              <h3 className="text-lg font-semibold">Zoekopdrachten</h3>
-              <p className="text-2xl font-bold">{savedSearches.length}</p>
+              <h3 className="text-lg font-semibold">Bezichtigingen</h3>
+              <p className="text-2xl font-bold">0</p>
             </div>
           </div>
         </div>
 
         <div className="bg-white p-6 rounded-lg shadow-sm">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-blue-100 text-blue-600 rounded-lg">
-                <User className="w-5 h-5" />
-              </div>
-              <span className="text-lg font-medium text-gray-900">
-                {profile?.display_name || user?.email?.split('@')[0] || 'Gebruiker'}
-              </span>
+          <div className="flex items-center gap-4">
+            <div className="p-3 bg-green-100 text-green-600 rounded-lg">
+              <User className="w-6 h-6" />
             </div>
-            <Link
-              to="/profiel"
-              className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-md transition-colors"
+            <div>
+              <h3 className="text-lg font-semibold">Profiel</h3>
+              <p className="text-sm text-gray-600">Voltooid</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Collapsible Messages Section */}
+        <div className="bg-white p-6 rounded-lg shadow-sm">
+          <div className="flex items-center gap-4">
+            <div className="p-3 bg-purple-100 text-purple-600 rounded-lg">
+              <MessageSquare className="w-6 h-6" />
+            </div>
+            <div className="flex-1">
+              <h3 className="text-lg font-semibold">Berichten</h3>
+              <p className="text-sm text-gray-600">Communicatie</p>
+            </div>
+            <button
+              onClick={() => setIsMessagesExpanded(!isMessagesExpanded)}
+              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
             >
-              <User className="w-4 h-4" />
-              Mijn Profiel
-            </Link>
+              {isMessagesExpanded ? (
+                <ChevronUp className="w-5 h-5" />
+              ) : (
+                <ChevronDown className="w-5 h-5" />
+              )}
+            </button>
           </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      {/* Expandable Messages Dashboard */}
+      {isMessagesExpanded && (
+        <div className="mb-8 bg-white rounded-lg shadow-sm p-6">
+          <h2 className="text-xl font-bold mb-4">Uw Berichten</h2>
+          <SimpleMessagesDashboard />
+        </div>
+      )}
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2">
-          <div className="bg-white rounded-lg shadow-sm mb-6">
-            <div className="p-6 border-b">
-              <h2 className="text-xl font-semibold">Favoriete Woningen</h2>
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-2xl font-bold">Uw Favorieten</h2>
+            <Link to="/zoeken" className="text-red-600 hover:text-red-700 font-medium">
+              Meer zoeken →
+            </Link>
+          </div>
+
+          {favoriteProperties.length === 0 ? (
+            <div className="bg-white p-8 rounded-lg shadow-sm text-center">
+              <Heart className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+              <h3 className="text-lg font-semibold mb-2">Nog geen favorieten</h3>
+              <p className="text-gray-600 mb-4">
+                Begin met het verkennen van woningen en voeg ze toe aan uw favorieten
+              </p>
+              <Link 
+                to="/zoeken" 
+                className="inline-flex items-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+              >
+                Woningen bekijken
+              </Link>
             </div>
-            <div className="p-6">
-              {favoriteProperties.length > 0 ? (
-                <>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {favoriteProperties.map((property) => (
-                      <PropertyCard key={property.id} property={property} />
-                    ))}
-                  </div>
-                  {hasMore && (
-                    <div className="text-center mt-6">
-                      <button
-                        onClick={loadMore}
-                        disabled={favoritesLoading}
-                        className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                      >
-                        {favoritesLoading ? 'Laden...' : 'Meer laden'}
-                      </button>
-                    </div>
-                  )}
-                </>
-              ) : (
-                <div className="text-center text-gray-500 py-8">
-                  <Heart className="w-12 h-12 mx-auto mb-4 stroke-1" />
-                  <p>U heeft nog geen woningen als favoriet gemarkeerd</p>
-                  <Link to="/zoeken" className="text-blue-600 hover:underline mt-2 inline-block">
-                    Bekijk alle woningen
-                  </Link>
+          ) : (
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {favoriteProperties.map((property) => (
+                  <PropertyCard key={property.id} property={property} />
+                ))}
+              </div>
+              
+              {hasMore && (
+                <div className="text-center">
+                  <button
+                    onClick={loadMore}
+                    className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                  >
+                    Meer laden
+                  </button>
                 </div>
               )}
             </div>
-          </div>
+          )}
         </div>
 
-        <div className="lg:col-span-1">
-          <div className="bg-white rounded-lg shadow-sm">
-            <div className="p-6 border-b">
-              <h2 className="text-xl font-semibold">Zoekopdrachten</h2>
-            </div>
-            <div className="divide-y">
-              {savedSearches.map((search) => {
-                // Convert search params back to URL string
-                const searchUrl = new URLSearchParams(search.searchParams).toString();
-                const searchLink = searchUrl ? `/zoeken?${searchUrl}` : '/zoeken';
-                
-                return (
-                  <div key={search.id} className="p-4 hover:bg-gray-50">
-                    <div className="flex items-start justify-between">
-                      <Link to={searchLink} className="block flex-1">
-                        <h3 className="font-medium mb-1">{search.name}</h3>
-                        <p className="text-sm text-gray-500">
-                          Opgeslagen op {new Date(search.date).toLocaleDateString()}
-                        </p>
-                      </Link>
-                      <button
-                        onClick={(e) => {
-                          e.preventDefault();
-                          if (window.confirm('Weet u zeker dat u deze zoekopdracht wilt verwijderen?')) {
-                            deleteSearch(search.id);
-                          }
-                        }}
-                        className="p-1 text-gray-400 hover:text-red-600 ml-2"
-                        title="Verwijderen"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
+        <div className="space-y-6">
+          <div className="bg-white p-6 rounded-lg shadow-sm">
+            <h3 className="text-lg font-semibold mb-4">Opgeslagen Zoekopdrachten</h3>
+            {savedSearches.length === 0 ? (
+              <p className="text-gray-600 text-sm">
+                U heeft nog geen opgeslagen zoekopdrachten
+              </p>
+            ) : (
+              <div className="space-y-3">
+                {savedSearches.map((search) => (
+                  <div key={search.id} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                    <div>
+                      <p className="font-medium">{search.name}</p>
+                      <p className="text-sm text-gray-600">
+                        Opgeslagen zoekopdracht
+                      </p>
                     </div>
+                    <button
+                      onClick={() => deleteSearch(search.id)}
+                      className="p-1 text-gray-400 hover:text-red-600"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
                   </div>
-                );
-              })}
-              {savedSearches.length === 0 && (
-                <div className="text-center text-gray-500 py-8">
-                  <Bell className="w-12 h-12 mx-auto mb-4 stroke-1" />
-                  <p>U heeft nog geen zoekopdrachten opgeslagen</p>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div className="bg-white p-6 rounded-lg shadow-sm">
+            <h3 className="text-lg font-semibold mb-4">Profiel Beheer</h3>
+            <div className="space-y-3">
+              <Link 
+                to="/profiel"
+                className="block w-full text-left p-3 border rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                <div className="flex items-center gap-3">
+                  <User className="w-5 h-5 text-gray-600" />
+                  <span>Profiel bewerken</span>
                 </div>
-              )}
+              </Link>
             </div>
           </div>
         </div>
       </div>
     </main>
   );
-}
+};

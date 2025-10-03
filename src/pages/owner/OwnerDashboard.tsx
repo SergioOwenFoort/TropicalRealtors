@@ -9,6 +9,7 @@ import { usePaginatedFavorites } from '../../hooks/usePaginatedFavorites';
 import { PropertyCard } from '../../components/ui/PropertyCard';
 import { OwnerPropertyTable } from '../../components/owner/OwnerPropertyTable';
 import { CarouselManagement } from '../../components/admin/CarouselManagement';
+import { SimpleMessagesDashboard } from '../../components/messages/SimpleMessagesDashboard';
 import { LoadingSpinner } from '../../components/LoadingSpinner';
 import { useEffect } from 'react';
 
@@ -75,6 +76,11 @@ export function OwnerDashboard() {
       {/* Carousel Management */}
       <div className="mb-12">
         <CarouselManagement />
+      </div>
+
+      {/* Messages Dashboard */}
+      <div className="mb-12">
+        <SimpleMessagesDashboard title="Mijn Berichten" />
       </div>
 
       {/* Mijn Woningen Section - Enhanced Table */}

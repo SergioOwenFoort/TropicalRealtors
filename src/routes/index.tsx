@@ -23,7 +23,6 @@ import { UpdatePasswordPage } from '../pages/auth/UpdatePasswordPage';
 import { ForgotPasswordResetPage } from '../pages/auth/ForgotPasswordResetPage';
 import App from '../App';
 import NotFound from '../pages/NotFound';
-import { MasterIslandProvider } from '../contexts/MasterIslandContext';
 
 export const router = createBrowserRouter([
   {
@@ -57,7 +56,7 @@ export const router = createBrowserRouter([
       },
       {
         path: '',
-        element: <MasterIslandProvider><Layout /></MasterIslandProvider>,
+        element: <Layout />,
         children: [
           {
             index: true,

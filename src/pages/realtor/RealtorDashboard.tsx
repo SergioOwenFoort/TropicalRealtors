@@ -8,6 +8,8 @@ import { PropertyViewTracker } from '../../services/propertyViewTracker';
 // import { WebhookTest } from '../../components/realtor/WebhookTest';
 import { RealtorProfile } from '../../components/realtor/RealtorProfile';
 import { CarouselManagement } from '../../components/admin/CarouselManagement';
+import { MessagesDashboard } from '../../components/messages/MessagesDashboard';
+import { SimpleMessagesDashboard } from '../../components/messages/SimpleMessagesDashboard';
 import { useProperties } from '../../hooks/useProperties';
 import { useAuth } from '../../hooks/useAuth';
 import { useProfile } from '../../hooks/useProfile';
@@ -82,7 +84,10 @@ export function RealtorDashboard() {
       <div className="space-y-8">
         <RealtorProfile />
         
-        <CsvUploader />
+        <SimpleMessagesDashboard 
+          title="Makelaar Berichten" 
+          className="mb-8" 
+        />        <CsvUploader />
         
         <div className="bg-white rounded-lg shadow-sm">
           <div className="p-6 border-b">

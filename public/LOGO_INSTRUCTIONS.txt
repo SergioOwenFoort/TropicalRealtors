@@ -1,0 +1,10 @@
+# TropicalRealtors Logo
+
+Please replace this file with your actual logo image.
+
+Save your logo image as 'logo.png' in this directory:
+c:\Users\sergi\Downloads\TropicalRealtors09-09-2025\TropicalRealtors.com\tropicalrealtors.com\public\
+
+The logo should be named exactly: logo.png
+
+Once you save it, the website will automatically use your logo image!
