@@ -7,13 +7,13 @@ export interface EmailTemplate {
 // You can easily customize these templates
 export const emailTemplates = {
   passwordReset: {
-    subject: 'Wachtwoord Resetten - Bonaire Makelaars',
+    subject: 'Wachtwoord Resetten - Tropical Realtors',
     html: (data: { email: string; resetUrl: string; userName?: string }) => `
       <!DOCTYPE html>
       <html>
       <head>
         <meta charset="utf-8">
-        <title>Wachtwoord Resetten - Bonaire Makelaars</title>
+        <title>Wachtwoord Resetten - Tropical Realtors</title>
         <style>
           body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
           .container { max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9fafb; }
@@ -31,7 +31,7 @@ export const emailTemplates = {
           <div class="email-body">
             
             <div class="logo">
-              <h1>Bonaire Makelaars</h1>
+              <h1>Tropical Realtors</h1>
             </div>
             
             <h2 style="color: #1f2937; margin-bottom: 16px;">Wachtwoord Resetten</h2>
@@ -41,7 +41,7 @@ export const emailTemplates = {
             </p>
             
             <p style="color: #374151; margin-bottom: 24px;">
-              U heeft een verzoek gedaan om uw wachtwoord te resetten voor uw Bonaire Makelaars account.
+              U heeft een verzoek gedaan om uw wachtwoord te resetten voor uw Tropical Realtors account.
               Klik op de onderstaande knop om verder te gaan met het resetten van uw wachtwoord.
             </p>
             
@@ -65,8 +65,8 @@ export const emailTemplates = {
             
             <div class="footer">
               <p style="margin: 0;">
-                © 2025 Bonaire Makelaars - Alle rechten voorbehouden<br>
-                Voor vragen kunt u contact opnemen via: beheer@bonairemakelaars.com
+                © 2025 Tropical Realtors - Alle rechten voorbehouden<br>
+                Voor vragen kunt u contact opnemen via: beheer@tropicalrealtors.com
               </p>
             </div>
             
@@ -103,7 +103,7 @@ export const emailTemplates = {
             
             <div class="logo">
               <h1>🛡️ Admin Dashboard</h1>
-              <p style="color: #6b7280; margin: 0; font-size: 16px;">Bonaire Makelaars</p>
+              <p style="color: #6b7280; margin: 0; font-size: 16px;">Tropical Realtors</p>
             </div>
             
             <h2 style="color: #1f2937; margin-bottom: 16px;">Wachtwoord Reset Verzoek</h2>
@@ -132,8 +132,8 @@ export const emailTemplates = {
             
             <div class="footer">
               <p style="margin: 0;">
-                Bonaire Makelaars Admin Systeem<br>
-                © 2025 Bonaire Makelaars - Alle rechten voorbehouden
+                Tropical Realtors Admin Systeem<br>
+                © 2025 Tropical Realtors - Alle rechten voorbehouden
               </p>
             </div>
             
@@ -146,11 +146,11 @@ export const emailTemplates = {
 
   // You can add more templates here:
   welcomeEmail: {
-    subject: 'Welkom bij Bonaire Makelaars',
+    subject: 'Welkom bij Tropical Realtors',
     html: (data: { userName: string; email: string }) => `
       <!-- Welcome email template -->
       <h1>Welkom ${data.userName}!</h1>
-      <p>Bedankt voor het registreren bij Bonaire Makelaars.</p>
+      <p>Bedankt voor het registreren bij Tropical Realtors.</p>
     `
   },
 

@@ -28,8 +28,12 @@ export const useServiceRoleAdmin = () => {
       );
       
       console.log('Credential check result:', credentialCheck);
+      console.log('Credential check error:', credentialError);
+      console.log('Credential check success field:', credentialCheck?.success);
+      console.log('Full credential response:', JSON.stringify(credentialCheck, null, 2));
       
       if (credentialError || !credentialCheck?.success) {
+        console.log('Login failed - error or no success field');
         setError(credentialError?.message || credentialCheck?.message || 'Invalid credentials');
         setIsAuthenticated(false);
         setIsLoading(false);

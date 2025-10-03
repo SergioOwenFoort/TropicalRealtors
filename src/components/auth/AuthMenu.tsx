@@ -3,6 +3,7 @@ import { LogIn, UserPlus, X, LayoutDashboard, Building2, Settings, User } from '
 import { useAuth } from '../../hooks/useAuth';
 import { useUserRole } from '../../hooks/useUserRole';
 import { useSupabaseAuthActions } from '../../hooks/useSupabaseAuthActions';
+import { useUnreadMessages } from '../../hooks/useUnreadMessages';
 
 interface AuthMenuProps {
   isOpen: boolean;
@@ -12,6 +13,7 @@ interface AuthMenuProps {
 export function AuthMenu({ isOpen, onClose }: AuthMenuProps) {
   const { user } = useAuth();
   const { isAdmin, isRealtor } = useUserRole();
+  const { unreadCount } = useUnreadMessages();
   const { logout } = useSupabaseAuthActions();
   const navigate = useNavigate();
 
@@ -63,22 +65,32 @@ export function AuthMenu({ isOpen, onClose }: AuthMenuProps) {
               {!isRealtor && (
                 <Link
                   to="/account"
-                  className="flex items-center gap-3 w-full px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  className="flex items-center gap-3 w-full px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors relative"
                   onClick={onClose}
                 >
                   <LayoutDashboard className="w-5 h-5" />
                   <span>Dashboard</span>
+                  {unreadCount > 0 && (
+                    <span className="ml-auto bg-red-500 text-white text-xs rounded-full min-w-[20px] h-5 flex items-center justify-center px-1">
+                      {unreadCount > 99 ? '99+' : unreadCount}
+                    </span>
+                  )}
                 </Link>
               )}
 
               {isRealtor && (
                 <Link
                   to="/makelaar"
-                  className="flex items-center gap-3 w-full px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  className="flex items-center gap-3 w-full px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors relative"
                   onClick={onClose}
                 >
                   <Building2 className="w-5 h-5" />
                   <span>Makelaarsdashboard</span>
+                  {unreadCount > 0 && (
+                    <span className="ml-auto bg-red-500 text-white text-xs rounded-full min-w-[20px] h-5 flex items-center justify-center px-1">
+                      {unreadCount > 99 ? '99+' : unreadCount}
+                    </span>
+                  )}
                 </Link>
               )}
 

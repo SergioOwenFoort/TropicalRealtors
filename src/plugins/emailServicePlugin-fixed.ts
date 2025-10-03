@@ -59,7 +59,7 @@ export default function emailServicePlugin(): Plugin {
               const htmlContent = template.html(data);
 
               const emailData = await resend.emails.send({
-                from: 'beheer@bonairemakelaars.com',
+                from: 'beheer@tropicalrealtors.com',
                 to: Array.isArray(to) ? to : [to],
                 subject: customSubject || subject,
                 html: htmlContent,

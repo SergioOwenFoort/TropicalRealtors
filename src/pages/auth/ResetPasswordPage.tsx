@@ -76,7 +76,7 @@ export function ResetPasswordPage() {
               <p className="text-sm text-green-800">
                 <strong>✅ Email verzonden!</strong><br />
                 Controleer uw inbox (en spam/junk map) voor instructies om uw wachtwoord te resetten.
-                De email komt van het Bonaire Makelaars systeem.
+                De email komt van het Tropical Realtors systeem.
               </p>
             </div>
           </div>

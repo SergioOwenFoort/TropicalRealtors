@@ -21,19 +21,19 @@ export default async function handler(req, res) {
 
     // Send password reset email
     const { data, error } = await resend.emails.send({
-      from: 'Bonaire Makelaars <noreply@bonairemakelaars.com>',
+      from: 'Tropical Realtors <noreply@tropicalrealtors.com>',
       to: email,
-      subject: 'Wachtwoord resetten - Bonaire Makelaars',
+      subject: 'Wachtwoord resetten - Tropical Realtors',
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
           <div style="text-align: center; margin-bottom: 30px;">
-            <h1 style="color: #2563eb; margin: 0;">Bonaire Makelaars</h1>
+            <h1 style="color: #2563eb; margin: 0;">Tropical Realtors</h1>
           </div>
           
           <h2 style="color: #1f2937;">Wachtwoord resetten</h2>
           
           <p style="color: #374151; line-height: 1.6;">
-            U heeft een verzoek gedaan om uw wachtwoord te resetten voor uw Bonaire Makelaars account.
+            U heeft een verzoek gedaan om uw wachtwoord te resetten voor uw Tropical Realtors account.
           </p>
           
           <p style="color: #374151; line-height: 1.6;">

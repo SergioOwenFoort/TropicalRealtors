@@ -119,18 +119,39 @@ export function useSupabaseAuthActions() {
     }
   };
 
-  const register = async (email: string, password: string) => {
+  const register = async (email: string, password: string, profileData?: {
+    role: string;
+    display_name: string;
+    first_name?: string;
+    last_name?: string;
+    phone?: string;
+    address?: string;
+    country_of_residence?: string;
+  }) => {
     try {
       setLoading(true);
-      // Use anon client for user registration to enable session persistence
-      const { data: { user }, error } = await supabaseAnon.auth.signUp({ email, password });
+      
+      // Prepare user metadata to store profile info for after email verification
+      const userMetadata = profileData || {
+        role: 'user',
+        display_name: email.split('@')[0]
+      };
+      
+      // Use anon client for user registration with metadata
+      const { error } = await supabaseAnon.auth.signUp({ 
+        email, 
+        password,
+        options: {
+          data: userMetadata
+        }
+      });
+      
       if (error) throw error;
       setError(null);
       
-      if (user) {
-        // Use service role for database operations
-        await supabaseService.updateProfile(user.id, { display_name: email.split('@')[0] });
-      }
+      // Note: We don't create the profile here since the user needs to verify email first
+      // The profile will be created by a database trigger when they verify their email
+      
     } catch (err) {
       handleError(err);
     } finally {
