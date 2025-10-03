@@ -24,20 +24,46 @@ export class PropertyViewTracker {
     try {
       // Don't track views for invalid IDs
       if (!propertyId || propertyId === 'undefined' || propertyId === 'null') {
+        console.log('Invalid property ID for tracking:', propertyId);
         return false;
       }
 
-      // Get current property to check if it exists
-      const { data: currentProperty } = await supabase
+      console.log('Attempting to track view for property:', propertyId);
+
+      // Try the database function first
+      const { data: rpcData, error: rpcError } = await supabase
+        .rpc('increment_property_view_count', { property_id: propertyId });
+
+      if (!rpcError && rpcData && rpcData.success) {
+        console.log(`Property view tracked via RPC: ${propertyId} (${rpcData.view_count} views)`);
+        return true;
+      }
+
+      console.log('RPC failed, trying manual approach. RPC Error:', rpcError);
+
+      // Fallback to manual approach if RPC fails
+      // First check if property exists
+      const { data: currentProperty, error: selectError } = await supabase
         .from('properties')
         .select('view_count')
         .eq('id', propertyId)
         .single();
 
+      if (selectError) {
+        console.error('Error checking property existence:', selectError);
+        return false;
+      }
+
+      if (!currentProperty) {
+        console.log('Property not found:', propertyId);
+        return false;
+      }
+
       const newViewCount = (currentProperty?.view_count || 0) + 1;
+      console.log(`Current view count: ${currentProperty?.view_count || 0}, new count: ${newViewCount}`);
 
       // Update the view count
-      const { error } = await supabase
+      const { error: updateError } = await supabase
         .from('properties')
         .update({
           view_count: newViewCount,
@@ -45,12 +71,12 @@ export class PropertyViewTracker {
         })
         .eq('id', propertyId);
 
-      if (error) {
-        console.error('Error tracking property view:', error);
+      if (updateError) {
+        console.error('Error updating property view count:', updateError);
         return false;
       }
 
-      console.log(`Property view tracked: ${propertyId} (${newViewCount} views)`);
+      console.log(`Property view tracked manually: ${propertyId} (${newViewCount} views)`);
       return true;
     } catch (error) {
       console.error('Error in trackView:', error);

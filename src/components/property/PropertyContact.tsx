@@ -1,18 +1,13 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Phone, Mail, Calendar, X } from 'lucide-react';
+import { Phone, Mail, X } from 'lucide-react';
 import { Property } from '../../types';
 import { useAuth } from '../../hooks/useAuth';
 import { toast } from 'react-hot-toast';
+import { MessageService } from '../../services/messageService';
 
 interface PropertyContactProps {
   property: Property;
   disableSticky?: boolean;
-}
-
-interface ViewingFormData {
-  date: string;
-  time: string;
-  notes: string;
 }
 
 interface MessageFormData {
@@ -21,24 +16,15 @@ interface MessageFormData {
 
 export function PropertyContact({ property, disableSticky = false }: PropertyContactProps) {
   const { user } = useAuth();
-  const [showViewingForm, setShowViewingForm] = useState(false);
   const [showMessageForm, setShowMessageForm] = useState(false);
-  const viewingModalRef = useRef<HTMLDivElement>(null);
+  const [submitting, setSubmitting] = useState(false);
   const messageModalRef = useRef<HTMLDivElement>(null);
-  const [viewingData, setViewingData] = useState<ViewingFormData>({
-    date: '',
-    time: '',
-    notes: ''
-  });
   const [messageData, setMessageData] = useState<MessageFormData>({
     message: ''
   });
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (showViewingForm && viewingModalRef.current && !viewingModalRef.current.contains(event.target as Node)) {
-        setShowViewingForm(false);
-      }
       if (showMessageForm && messageModalRef.current && !messageModalRef.current.contains(event.target as Node)) {
         setShowMessageForm(false);
       }
@@ -46,10 +32,10 @@ export function PropertyContact({ property, disableSticky = false }: PropertyCon
 
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [showViewingForm, showMessageForm]);
+  }, [showMessageForm]);
 
   useEffect(() => {
-    if (showViewingForm || showMessageForm) {
+    if (showMessageForm) {
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = 'unset';
@@ -58,44 +44,44 @@ export function PropertyContact({ property, disableSticky = false }: PropertyCon
     return () => {
       document.body.style.overflow = 'unset';
     };
-  }, [showViewingForm, showMessageForm]);
+  }, [showMessageForm]);
 
-  const handleViewingSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!user) {
-      toast.error('U moet ingelogd zijn om een bezichtiging aan te vragen');
-      return;
-    }
-
-    // In een echte applicatie zou dit een API call zijn
-    console.log('Viewing request:', {
-      propertyId: property.id,
-      userId: user.id,
-      ...viewingData
-    });
-
-    toast.success('Bezichtiging aangevraagd! We nemen zo snel mogelijk contact met u op.');
-    setShowViewingForm(false);
-    setViewingData({ date: '', time: '', notes: '' });
-  };
-
-  const handleMessageSubmit = (e: React.FormEvent) => {
+  const handleMessageSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) {
       toast.error('U moet ingelogd zijn om een bericht te sturen');
       return;
     }
 
-    // In een echte applicatie zou dit een API call zijn
-    console.log('Message sent:', {
-      propertyId: property.id,
-      userId: user.id,
-      ...messageData
-    });
+    if (!property.makelaarId) {
+      toast.error('Eigenaar informatie niet beschikbaar');
+      return;
+    }
 
-    toast.success('Bericht verzonden! De makelaar neemt zo snel mogelijk contact met u op.');
-    setShowMessageForm(false);
-    setMessageData({ message: '' });
+    setSubmitting(true);
+
+    try {
+      const result = await MessageService.sendMessage({
+        property_id: property.id,
+        recipient_id: property.makelaarId,
+        message: messageData.message,
+        message_type: 'inquiry',
+        subject: `Interesse in: ${property.title}`
+      });
+
+      if (result.success) {
+        toast.success('Bericht verzonden! De eigenaar ontvangt uw bericht en neemt contact met u op.');
+        setShowMessageForm(false);
+        setMessageData({ message: '' });
+      } else {
+        toast.error(result.error || 'Er is een fout opgetreden bij het versturen van uw bericht');
+      }
+    } catch (error) {
+      toast.error('Er is een fout opgetreden bij het versturen van uw bericht');
+      console.error('Error sending message:', error);
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -106,18 +92,11 @@ export function PropertyContact({ property, disableSticky = false }: PropertyCon
         <div className="space-y-4">
           <button 
             onClick={() => setShowMessageForm(true)}
-            className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
+            disabled={submitting}
+            className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Mail className="w-5 h-5" />
             <span>Stuur bericht</span>
-          </button>
-          
-          <button
-            onClick={() => setShowViewingForm(true)}
-            className="w-full bg-white text-blue-600 border-2 border-blue-600 py-3 px-4 rounded-lg hover:bg-blue-50 transition-colors flex items-center justify-center gap-2"
-          >
-            <Calendar className="w-5 h-5" />
-            <span>Plan bezichtiging</span>
           </button>
 
           <div className="mt-6 pt-6 border-t">
@@ -136,75 +115,6 @@ export function PropertyContact({ property, disableSticky = false }: PropertyCon
         </div>
       </div>
 
-      {/* Bezichtiging Modal */}
-      {showViewingForm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 md:p-8">
-          <div 
-            ref={viewingModalRef}
-            className="bg-white rounded-lg w-full max-w-md max-h-[90vh] overflow-y-auto relative"
-          >
-            <div className="p-6">
-              <button
-                onClick={() => setShowViewingForm(false)}
-                className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
-              >
-                <X className="w-6 h-6" />
-              </button>
-
-              <h2 className="text-2xl font-bold mb-6">Plan een bezichtiging</h2>
-
-              <form onSubmit={handleViewingSubmit} className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Datum
-                  </label>
-                  <input
-                    type="date"
-                    required
-                    value={viewingData.date}
-                    onChange={(e) => setViewingData(prev => ({ ...prev, date: e.target.value }))}
-                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-200 focus:border-blue-500"
-                    min={new Date().toISOString().split('T')[0]}
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Tijd
-                  </label>
-                  <input
-                    type="time"
-                    required
-                    value={viewingData.time}
-                    onChange={(e) => setViewingData(prev => ({ ...prev, time: e.target.value }))}
-                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-200 focus:border-blue-500"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Opmerkingen (optioneel)
-                  </label>
-                  <textarea
-                    value={viewingData.notes}
-                    onChange={(e) => setViewingData(prev => ({ ...prev, notes: e.target.value }))}
-                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-200 focus:border-blue-500"
-                    rows={3}
-                  />
-                </div>
-
-                <button
-                  type="submit"
-                  className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors"
-                >
-                  Bezichtiging aanvragen
-                </button>
-              </form>
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* Bericht Modal */}
       {showMessageForm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 md:p-8">
@@ -215,12 +125,22 @@ export function PropertyContact({ property, disableSticky = false }: PropertyCon
             <div className="p-6">
               <button
                 onClick={() => setShowMessageForm(false)}
-                className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+                disabled={submitting}
+                className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 disabled:opacity-50"
               >
                 <X className="w-6 h-6" />
               </button>
 
               <h2 className="text-2xl font-bold mb-6">Stuur een bericht</h2>
+              
+              <div className="mb-4 p-3 bg-blue-50 rounded-lg">
+                <p className="text-sm text-blue-700">
+                  <strong>Eigendom:</strong> {property.title}
+                </p>
+                <p className="text-sm text-blue-600">
+                  Uw bericht wordt direct naar de eigenaar/makelaar gestuurd via het dashboard.
+                </p>
+              </div>
 
               <form onSubmit={handleMessageSubmit} className="space-y-4">
                 <div>
@@ -229,19 +149,21 @@ export function PropertyContact({ property, disableSticky = false }: PropertyCon
                   </label>
                   <textarea
                     required
+                    disabled={submitting}
                     value={messageData.message}
                     onChange={(e) => setMessageData({ message: e.target.value })}
-                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-200 focus:border-blue-500"
+                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-200 focus:border-blue-500 disabled:opacity-50"
                     rows={6}
-                    placeholder="Schrijf hier uw bericht aan de makelaar..."
+                    placeholder="Schrijf hier uw bericht aan de eigenaar/makelaar..."
                   />
                 </div>
 
                 <button
                   type="submit"
-                  className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors"
+                  disabled={submitting || !messageData.message.trim()}
+                  className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Verstuur bericht
+                  {submitting ? 'Versturen...' : 'Verstuur bericht'}
                 </button>
               </form>
             </div>

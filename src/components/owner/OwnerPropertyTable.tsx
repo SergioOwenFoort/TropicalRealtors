@@ -4,6 +4,7 @@ import { Edit, Trash2, Eye, Heart, Calendar, Home } from 'lucide-react';
 import { Property } from '../../types';
 import { deleteProperty } from '../../services/propertyService';
 import { PropertyFavoriteTracker } from '../../services/propertyFavoriteTracker';
+import { supabase } from '../../config/supabase.config';
 import { toast } from 'react-hot-toast';
 
 interface OwnerPropertyTableProps {
@@ -23,29 +24,49 @@ export function OwnerPropertyTable({ properties, onPropertyDeleted }: OwnerPrope
 
   // Load favorite counts for all properties
   useEffect(() => {
-    const loadFavoriteCounts = async () => {
+    const loadStats = async () => {
       setLoading(true);
       try {
         const propertyIds = properties.map(p => p.id);
-        const favoriteCounts = await PropertyFavoriteTracker.getMultiplePropertyFavoriteCounts(propertyIds);
+        
+        // Load both favorite counts and fresh view counts
+        const [favoriteCounts, viewStats] = await Promise.all([
+          PropertyFavoriteTracker.getMultiplePropertyFavoriteCounts(propertyIds),
+          Promise.all(propertyIds.map(async (id) => {
+            // Fetch fresh view count from database
+            const { data } = await supabase
+              .from('properties')
+              .select('view_count')
+              .eq('id', id)
+              .single();
+            return { id, view_count: data?.view_count || 0 };
+          }))
+        ]);
+        
+        // Create view count lookup
+        const viewCountLookup = viewStats.reduce((acc, item) => {
+          acc[item.id] = item.view_count;
+          return acc;
+        }, {} as Record<string, number>);
         
         const enrichedProperties = properties.map(property => ({
           ...property,
-          favorite_count: favoriteCounts[property.id] || 0
+          favorite_count: favoriteCounts[property.id] || 0,
+          view_count: viewCountLookup[property.id] || 0
         }));
         
         setPropertiesWithStats(enrichedProperties);
       } catch (error) {
-        console.error('Error loading favorite counts:', error);
-        // Fallback to properties without favorite counts
-        setPropertiesWithStats(properties.map(p => ({ ...p, favorite_count: 0 })));
+        console.error('Error loading property stats:', error);
+        // Fallback to properties without stats
+        setPropertiesWithStats(properties.map(p => ({ ...p, favorite_count: 0, view_count: 0 })));
       } finally {
         setLoading(false);
       }
     };
 
     if (properties.length > 0) {
-      loadFavoriteCounts();
+      loadStats();
     } else {
       setPropertiesWithStats([]);
       setLoading(false);

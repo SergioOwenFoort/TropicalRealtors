@@ -52,7 +52,7 @@ export function PropertyCard({ property }: PropertyCardProps) {
         <img
           src={property.images[0]}
           alt={property.title}
-          className="w-full h-24 sm:h-32 object-cover rounded-t-xl"
+          className="w-full h-48 sm:h-56 md:h-48 object-cover rounded-t-xl"
           loading="lazy"
           decoding="async"
         />
@@ -76,11 +76,11 @@ export function PropertyCard({ property }: PropertyCardProps) {
           )}
         </div>
       </div>
-      <div className="p-4">
-        <div className="flex justify-between items-start mb-2">
-          <h3 className="text-xl font-semibold">{property.price.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}</h3>
+      <div className="p-4 sm:p-4">
+        <div className="flex justify-between items-start mb-3">
+          <h3 className="text-lg sm:text-xl font-semibold">{property.price.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}</h3>
         </div>
-        <div className="flex items-center gap-2 text-gray-600 mb-3">
+        <div className="flex items-center gap-2 text-gray-600 mb-4">
           <MapPin className="w-4 h-4 flex-shrink-0" />
           <p className="truncate text-sm sm:text-base">
             {property.address}
@@ -104,7 +104,7 @@ export function PropertyCard({ property }: PropertyCardProps) {
             )}
           </p>
         </div>
-        <div className="flex items-center gap-4 text-gray-500 text-sm sm:text-base">
+        <div className="flex items-center gap-3 sm:gap-4 text-gray-500 text-sm">
           <div className="flex items-center gap-1">
             <Bed className="w-4 h-4" />
             <span>{property.bedrooms}</span>
