@@ -92,5 +92,39 @@ export interface PropertyFilters {
   minSize?: number;
 }
 
+// Message types for the messaging system
+export interface Message {
+  id: string;
+  property_id: string;
+  sender_id: string;
+  recipient_id: string;
+  subject: string;
+  message: string;
+  message_type: 'inquiry' | 'viewing_request' | 'general';
+  status: 'unread' | 'read' | 'replied' | 'archived';
+  created_at: string;
+  updated_at: string;
+}
+
+export interface SendMessageRequest {
+  property_id: string;
+  recipient_id: string;
+  message: string;
+  message_type: 'inquiry' | 'viewing_request' | 'general';
+  subject?: string;
+}
+
+export interface MessageFilters {
+  folder?: 'inbox' | 'sent' | 'all';
+  status?: 'unread' | 'read' | 'replied' | 'archived';
+  message_type?: 'inquiry' | 'viewing_request' | 'general';
+}
+
+export interface MessageStats {
+  total: number;
+  unread: number;
+  archived: number;
+}
+
 // Re-export the Realtor interface
 export type { Realtor, RealtorUpload } from './realtor';
