@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ListFilter, User, Eye, Home, TrendingUp, BarChart3 } from 'lucide-react';
-import { CsvUploader } from '../../components/realtor/CsvUploader';
+import { ListFilter, User, Eye, Home, TrendingUp, BarChart3, Plus } from 'lucide-react';
 import { RealtorPropertyTable } from '../../components/realtor/RealtorPropertyTable';
+import { ListingUploader } from '../../components/realtor/ListingUploader';
 import { PropertyViewTracker } from '../../services/propertyViewTracker';
 // ...existing code...
 // import { WebhookTest } from '../../components/realtor/WebhookTest';
@@ -19,6 +19,7 @@ export function RealtorDashboard() {
   const { user } = useAuth();
   const { profile } = useProfile();
   const [statusFilter, setStatusFilter] = useState<Property['status'] | 'all'>('all');
+  const [showSingleUploader, setShowSingleUploader] = useState(false);
   
   // Statistics state
   const [totalViews, setTotalViews] = useState(0);
@@ -88,8 +89,6 @@ export function RealtorDashboard() {
           className="mb-8" 
         />
         
-        <CsvUploader />
-        
         <div className="bg-white rounded-lg shadow-sm">
           <div className="p-6 border-b">
             <div className="flex items-center justify-between">
@@ -153,6 +152,18 @@ export function RealtorDashboard() {
             </div>
           </div>
 
+          {/* Add New Property Button */}
+          <div className="p-6 border-b">
+            <button
+              className="w-full py-3 px-4 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
+              type="button"
+              onClick={() => setShowSingleUploader(true)}
+            >
+              <Plus className="w-5 h-5" />
+              Nieuwe woning toevoegen
+            </button>
+          </div>
+
           <RealtorPropertyTable 
             properties={properties}
             onPropertyDeleted={refreshProperties}
@@ -165,6 +176,23 @@ export function RealtorDashboard() {
         {/* <WebhookTest /> */}
 
       </div>
+
+      {/* Single Listing Upload Modal */}
+      {showSingleUploader && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+          <div className="bg-white rounded-lg shadow-lg p-6 relative min-w-[350px]">
+            <button
+              className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
+              onClick={() => setShowSingleUploader(false)}
+              type="button"
+              aria-label="Sluiten"
+            >
+              ×
+            </button>
+            <ListingUploader onClose={() => setShowSingleUploader(false)} />
+          </div>
+        </div>
+      )}
 
       {/* ListingUploader removed */}
     </main>
