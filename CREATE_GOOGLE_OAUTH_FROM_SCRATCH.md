@@ -3,7 +3,7 @@
 ### Step 1: Create Google Cloud Project
 1. Go to [Google Cloud Console](https://console.cloud.google.com/)
 2. Click "Select a project" → "New Project"
-3. Name: "Bonaire Makelaars" 
+3. Name: "Tropical Realtors" 
 4. Click "Create"
 
 ### Step 2: Enable Required APIs
@@ -15,7 +15,7 @@
 1. Go to "APIs & Services" → "OAuth consent screen"
 2. Choose "External" (unless you have G Suite)
 3. Fill in required information:
-   - **App name**: Bonaire Makelaars
+   - **App name**: Tropical Realtors
    - **User support email**: Your email
    - **Developer contact**: Your email
 4. Save and continue through the steps
@@ -24,7 +24,7 @@
 1. Go to "APIs & Services" → "Credentials"
 2. Click "+ CREATE CREDENTIALS" → "OAuth 2.0 Client ID"
 3. Application type: "Web application"
-4. Name: "Bonaire Makelaars Website"
+4. Name: "Tropical Realtors Website"
 
 ### Step 5: Configure Authorized URIs
 **Authorized JavaScript origins:**

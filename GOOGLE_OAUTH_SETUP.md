@@ -1,4 +1,4 @@
-# Google OAuth Setup Guide for Bonaire Makelaars
+# Google OAuth Setup Guide for Tropical Realtors
 
 ## 🎉 Current Status
 ✅ **Google OAuth is already configured and working in your Supabase project!**

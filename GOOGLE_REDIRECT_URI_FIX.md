@@ -62,7 +62,7 @@ If you haven't created Google OAuth credentials yet:
    - Click "+ Create Credentials"
    - Select "OAuth 2.0 Client ID"
    - Choose "Web application"
-   - Name: "Bonaire Makelaars Website"
+   - Name: "Tropical Realtors Website"
 
 3. **Configure Application**:
    - **Authorized JavaScript origins**: `https://imhtjggudeidvmpgwjho.supabase.co`
