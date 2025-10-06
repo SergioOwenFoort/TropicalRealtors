@@ -29,9 +29,9 @@ export function WhyChooseUs() {
     <section className="py-12 px-4 bg-gray-50">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold mb-4">Waarom Woningaanbod.eu?</h2>
+          <h2 className="text-3xl font-bold mb-4">Waarom TropicalRealtors.com?</h2>
           <p className="text-gray-600 max-w-2xl mx-auto">
-            Wij maken het vinden van uw droomhuis in Europa eenvoudig en betrouwbaar
+            Wij maken het vinden van uw droomhuis in het Caribbisch gebied eenvoudig
           </p>
         </div>
         
