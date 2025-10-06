@@ -233,6 +233,13 @@ export function MenuBonaire() {
                 </div>
               )}
               <Link
+                to="/zoeken"
+                className="block py-2 text-gray-600"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Alle woningen
+              </Link>
+              <Link
                 to="/makelaars"
                 className="block py-2 text-gray-600"
                 onClick={() => setIsMobileMenuOpen(false)}
@@ -266,13 +273,6 @@ export function MenuBonaire() {
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 Contact
-              </Link>
-              <Link
-                to="/zoeken"
-                className="block py-2 text-gray-600"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                Alle woningen
               </Link>
               {user && (
                 <>
