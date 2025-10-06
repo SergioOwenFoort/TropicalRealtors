@@ -21,12 +21,12 @@ export const EUROPEAN_COUNTRIES: Island[] = [
 
 // Caribbean Islands
 export const CARIBBEAN_COUNTRIES: Island[] = [
-  { label: 'Bonaire', flag: '🇧🇶' },
-  { label: 'Aruba', flag: '🇦🇼' },
+  { label: 'Aruba', flag: '��' },
+  { label: 'Bonaire', flag: '��' },
   { label: 'Curaçao', flag: '🇨🇼' },
   { label: 'Saba', flag: '🇸🇦' },
-  { label: 'Sint Maarten', flag: '🇸🇽' },
-  { label: 'Sint Eustatius', flag: '🇧🇶' },
+  { label: 'Sint Eustatius', flag: '��' },
+  { label: 'Sint Maarten', flag: '��' },
 ].sort((a, b) => a.label.localeCompare(b.label));
 // Saba locations
 export const SABA_LOCATIONS: Island[] = [
