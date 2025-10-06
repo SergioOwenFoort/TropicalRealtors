@@ -4,13 +4,13 @@ import { Globe2, Shield, HeartHandshake, Search } from 'lucide-react';
 const FEATURES = [
   {
     icon: Globe2,
-    title: 'Europees Netwerk',
-    description: 'Toegang tot duizenden woningen in heel Europa via ons uitgebreide netwerk van makelaars.'
+    title: 'Caribisch Netwerk',
+    description: 'Toegang tot vele woningen, vakantiehuizen, hotels en resorts via ons uitgebreid netwerk.'
   },
   {
     icon: Shield,
     title: 'Veilig & Betrouwbaar',
-    description: 'Alle makelaars zijn geverifieerd en woningen worden zorgvuldig gecontroleerd.'
+    description: 'Alle deelnemers zorgen zorgvuldig voor hun aanbod.'
   },
   {
     icon: HeartHandshake,
@@ -20,7 +20,7 @@ const FEATURES = [
   {
     icon: Search,
     title: 'Slim Zoeken',
-    description: 'Geavanceerde zoekfuncties helpen u de perfecte woning te vinden in uw droomland.'
+    description: 'Geavanceerde zoekfuncties helpen u de perfecte woning te vinden in uw droomeiland.'
   }
 ];
 
