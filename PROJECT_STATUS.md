@@ -54,7 +54,7 @@ VITE_ADMIN_EMAIL=your-admin@domain.com
 VITE_ADMIN_PASSWORD=YourSecurePassword123!
 VITE_SUPABASE_URL=https://your-project.supabase.co
 VITE_SUPABASE_ANON_KEY=your-anon-key
-VITE_SUPABASE_SERVICE_KEY=your-service-key
+SUPABASE_SERVICE_KEY=your-service-key (server-only; do not prefix with VITE_)
 ```
 
 #### **Database Setup**

@@ -4,30 +4,54 @@
 
 import { createClient } from '@supabase/supabase-js';
 
+// Types for the admin operations we expose
+interface AdminOperations {
+  getAllProfiles: () => Promise<unknown>;
+  getProfileByEmail: (email: string) => Promise<unknown>;
+  isAdmin: (email: string) => Promise<boolean>;
+  adminLogin: (email: string, password: string) => Promise<{
+    success: boolean;
+    error?: string;
+    user?: { id: string; email: string; role: string; display_name?: string };
+  }>;
+}
+
 // Environment variables
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseServiceKey = import.meta.env.VITE_SUPABASE_SERVICE_KEY;
+// URL can come from Vite (safe to expose) or server env; service key MUST be server-only.
+const supabaseUrl = (import.meta as any)?.env?.VITE_SUPABASE_URL || (typeof process !== 'undefined' ? process.env.SUPABASE_URL : undefined);
+// Name aligned with docs: SUPABASE_SERVICE_ROLE_KEY (also allow SUPABASE_SERVICE_KEY for convenience)
+const supabaseServiceKey = (typeof process !== 'undefined' && process.env && (process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_KEY)) as string | undefined;
 
 // Ensure environment variables exist
-if (!supabaseUrl || !supabaseServiceKey) {
+// Prevent accidental import in the browser — provide a no-op shim instead of throwing to avoid hard runtime crashes
+const isBrowser = typeof window !== 'undefined' && typeof document !== 'undefined';
+// Prepare shims to avoid top-level export inside conditional blocks
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const browserShim: any = new Proxy({}, {
+  get() {
+    throw new Error('supabaseAdmin/adminOperations are server-only and cannot be used in the browser');
+  }
+});
+
+if (!isBrowser && (!supabaseUrl || !supabaseServiceKey)) {
   console.error('Missing service role configuration! Admin functions will not work.');
-  console.error('Please set VITE_SUPABASE_SERVICE_KEY in your .env file');
+  console.error('Please set SUPABASE_SERVICE_ROLE_KEY (or SUPABASE_SERVICE_KEY) in your server environment');
 }
 
 // Create a service role client with elevated permissions
-export const supabaseAdmin = createClient(
-  supabaseUrl as string, 
-  supabaseServiceKey as string,
+export const supabaseAdmin = !isBrowser ? createClient(
+  supabaseUrl as string,
+  (supabaseServiceKey as string) || 'DUMMY_DO_NOT_USE',
   {
     auth: {
       autoRefreshToken: false,
       persistSession: false,
     },
   }
-);
+): browserShim;
 
 // Admin operations that bypass RLS and auth schema
-export const adminOperations = {
+export const adminOperations: AdminOperations = !isBrowser ? {
   // Get all profiles regardless of RLS
   async getAllProfiles() {
     return await supabaseAdmin.from('profiles').select('*');
@@ -103,7 +127,7 @@ export const adminOperations = {
       return { success: false, error: 'Admin login failed' };
     }
   }
-};
+} as AdminOperations : (browserShim as unknown as AdminOperations);
 
 // Hook for admin operations
 export function useAdminOperations() {

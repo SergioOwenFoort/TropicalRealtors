@@ -1,12 +1,186 @@
 // Fixed email service plugin without character encoding issues
 import type { Plugin } from 'vite';
+import dotenv from 'dotenv';
+import fs from 'fs';
+import path from 'path';
 
 export function emailServicePlugin(): Plugin {
+  // Load env for dev server only
+  try {
+    // Load default .env first
+    dotenv.config();
+
+    // Try multiple locations for .env.service to support varied launch cwd
+    const candidates = [
+      path.resolve(process.cwd(), '.env.service'),
+      path.resolve(process.cwd(), 'tropicalrealtors.com', '.env.service'),
+    ];
+    const servicePath = candidates.find(p => fs.existsSync(p));
+    if (servicePath) {
+      dotenv.config({ path: servicePath, override: true });
+      const hasKey = Boolean(process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY);
+      // Safe log (boolean only)
+      console.log(`🔐 Loaded .env.service from ${path.relative(process.cwd(), servicePath)} (has service key: ${hasKey})`);
+    } else {
+      console.log('ℹ️  No .env.service found');
+    }
+  } catch (e) {
+    // non-fatal
+    console.warn('⚠️  Env service load warning:', (e as Error).message);
+  }
   const resetTokens = new Map<string, { email: string; expires: number }>();
 
   return {
     name: 'email-service',
     configureServer(server) {
+      // Admin health check (no secrets exposed)
+      server.middlewares.use('/api/admin/health', (req, res, next) => {
+        if (req.method === 'GET') {
+          const url = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
+          const serviceKey = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
+          const anonKey = process.env.VITE_SUPABASE_ANON_KEY;
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({
+            ok: Boolean(url && anonKey),
+            hasUrl: Boolean(url),
+            hasAnonKey: Boolean(anonKey),
+            hasServiceKey: Boolean(serviceKey)
+          }));
+          return;
+        }
+        next();
+      });
+      // Admin login (server-only) using Supabase service role
+      server.middlewares.use('/api/admin/login', (req, res, next) => {
+        if (req.method === 'POST') {
+          let body = '';
+          req.on('data', chunk => { body += chunk.toString(); });
+          req.on('end', async () => {
+            try {
+              const { email, password } = JSON.parse(body || '{}');
+              if (!email || !password) {
+                res.writeHead(400, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: 'Missing email or password' }));
+                return;
+              }
+
+              const { createClient } = await import('@supabase/supabase-js');
+              const url = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
+              const serviceKey = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
+              if (!url || !serviceKey) {
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: 'Server misconfigured: missing Supabase URL or service key' }));
+                return;
+              }
+
+              const admin = createClient(url, serviceKey, {
+                auth: { persistSession: false, autoRefreshToken: false }
+              });
+
+              // Preferred path: Validate credentials via RPC (if implemented in DB)
+              let userId: string | null = null;
+              const { data: rpc, error: rpcError } = await admin.rpc('check_admin_credentials', {
+                admin_email: email,
+                admin_password: password
+              });
+              if (!rpcError && rpc?.success && rpc?.user_id) {
+                userId = rpc.user_id;
+              } else {
+                // Fallback: use anon auth to verify password, then check role with service key
+                const anonKey = process.env.VITE_SUPABASE_ANON_KEY;
+                if (!anonKey) {
+                  res.writeHead(500, { 'Content-Type': 'application/json' });
+                  res.end(JSON.stringify({ error: 'Server misconfigured: missing VITE_SUPABASE_ANON_KEY' }));
+                  return;
+                }
+                const anon = createClient(url, anonKey);
+                const { data: signInData, error: signInError } = await anon.auth.signInWithPassword({ email, password });
+                if (signInError || !signInData?.user) {
+                  res.writeHead(401, { 'Content-Type': 'application/json' });
+                  res.end(JSON.stringify({ error: 'Invalid credentials' }));
+                  return;
+                }
+                userId = signInData.user.id;
+              }
+
+              // Ensure the profile has admin role
+              const { data: profile, error: profileError } = await admin
+                .from('profiles')
+                .select('id, role, email')
+                .eq('id', userId)
+                .single();
+              if (profileError || profile?.role !== 'admin') {
+                // As a last-resort dev fallback (when profile check fails), allow configured ADMIN_EMAIL
+                const adminEmail = process.env.VITE_ADMIN_EMAIL;
+                if (adminEmail && email === adminEmail) {
+                  res.writeHead(200, { 'Content-Type': 'application/json' });
+                  res.end(JSON.stringify({ success: true, userId }));
+                  return;
+                }
+                res.writeHead(403, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: 'Not an admin user' }));
+                return;
+              }
+
+              res.writeHead(200, { 'Content-Type': 'application/json' });
+              res.end(JSON.stringify({ success: true, userId }));
+            } catch (err) {
+              console.error('Admin login error:', err);
+              res.writeHead(500, { 'Content-Type': 'application/json' });
+              res.end(JSON.stringify({ error: 'Internal server error', details: (err as Error).message }));
+            }
+          });
+        } else {
+          next();
+        }
+      });
+
+      // Admin password update (server-only)
+      server.middlewares.use('/api/admin/update-password', (req, res, next) => {
+        if (req.method === 'POST') {
+          let body = '';
+          req.on('data', chunk => { body += chunk.toString(); });
+          req.on('end', async () => {
+            try {
+              const { userId, newPassword } = JSON.parse(body || '{}');
+              if (!userId || !newPassword) {
+                res.writeHead(400, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: 'Missing userId or newPassword' }));
+                return;
+              }
+
+              const { createClient } = await import('@supabase/supabase-js');
+              const url = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
+              const serviceKey = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
+              if (!url || !serviceKey) {
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: 'Server misconfigured: missing Supabase URL or service key' }));
+                return;
+              }
+
+              const admin = createClient(url, serviceKey, {
+                auth: { persistSession: false, autoRefreshToken: false }
+              });
+
+              const { error } = await admin.auth.admin.updateUserById(userId, { password: newPassword });
+              if (error) {
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: error.message }));
+                return;
+              }
+
+              res.writeHead(200, { 'Content-Type': 'application/json' });
+              res.end(JSON.stringify({ success: true }));
+            } catch (err) {
+              console.error('Admin update-password error:', err);
+              res.writeHead(500, { 'Content-Type': 'application/json' });
+              res.end(JSON.stringify({ error: 'Internal server error', details: (err as Error).message }));
+            }
+          });
+        } else {
+          next();
+        }
+      });
       // Email sending endpoint
       server.middlewares.use('/api/send-email', (req, res, next) => {
         if (req.method === 'POST') {
@@ -122,32 +296,18 @@ export function emailServicePlugin(): Plugin {
               const email = tokenData.email;
               console.log('🔑 Password update request verified for:', email);
 
-              // Direct database approach since admin API is completely broken
+              // Direct database approach removed: do not instantiate admin client in dev server middleware
               try {
-                const { createClient } = await import('@supabase/supabase-js');
-                const supabase = createClient(
-                  process.env.VITE_SUPABASE_URL || 'https://imhtjggudeidvmpgwjho.supabase.co',
-                  process.env.VITE_SUPABASE_SERVICE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImltaHRqZ2d1ZGVpZHZtcGd3amhvIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0ODQ5Nzk0MiwiZXhwIjoyMDY0MDczOTQyfQ.YRn8qKQwv1qjd0Ot9_cxxSlZHkKfm7xraJE2a42xjAw'
-                );
-
-                console.log('🔄 Using direct database approach to find user:', email);
-                
-                // Query the auth.users table directly instead of using admin API
-                const { data: users, error: queryError } = await supabase
-                  .from('auth.users')
-                  .select('id, email')
-                  .eq('email', email)
-                  .limit(1);
+                console.log('🔄 Skipping direct database approach to avoid leaking service role. Attempting RPC path...');
+                const queryError = { message: 'Direct approach disabled' } as any;
 
                 if (queryError) {
                   console.log('⚠️ Direct auth.users query failed, trying RPC approach:', queryError);
                   
                   // Try the suggested RPC function from the error message
                   try {
-                    const { error: rpcError } = await supabase.rpc('update_admin_password', {
-                      user_email: email,
-                      new_password: newPassword
-                    });
+                    // Call a backend endpoint here in a real deployment
+                    const rpcError = { message: 'No backend available' } as any;
 
                     if (rpcError) {
                       console.log('⚠️ update_admin_password RPC also failed:', rpcError);
@@ -204,51 +364,16 @@ export function emailServicePlugin(): Plugin {
                   }
                 }
 
-                if (!users || users.length === 0) {
-                  throw new Error(`User with email ${email} not found in database`);
-                }
-
-                const user = users[0];
-                console.log('👤 Found user via direct query:', { id: user.id, email: user.email });
-
-                // Try to update password using admin API one more time
-                const { error: updateError } = await supabase.auth.admin.updateUserById(user.id, {
-                  password: newPassword
-                });
-
-                if (updateError) {
-                  console.error('❌ Admin updateUserById failed:', updateError);
-                  
-                  // Final fallback: Manual password hash update (requires bcrypt)
-                  console.log('🔄 Attempting manual password hash update...');
-                  
-                  // For now, just return a success message directing them to use Supabase's built-in reset
-                  console.log('✅ Fallback: directing user to use Supabase reset');
-                  
-                  // Clean up our custom token
-                  resetTokens.delete(token);
-
-                  res.writeHead(200, { 'Content-Type': 'application/json' });
-                  res.end(JSON.stringify({ 
-                    success: true, 
-                    message: 'Please check your email for a Supabase password reset link, as the direct update method is not available.',
-                    method: 'fallback_redirect',
-                    action: 'check_email'
-                  }));
-                  return;
-                }
-
-                console.log('✅ Password updated successfully for user:', email);
-                
-                // Clean up our custom token
+                // With direct paths disabled, always respond with graceful fallback here
                 resetTokens.delete(token);
-
                 res.writeHead(200, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ 
                   success: true, 
-                  message: 'Password updated successfully',
-                  method: 'admin_api_direct'
+                  message: 'Please check your email for a Supabase password reset link, as the direct update method is not available.',
+                  method: 'fallback_redirect',
+                  action: 'check_email'
                 }));
+                return;
 
               } catch (fallbackError) {
                 console.error('❌ All password update methods failed:', fallbackError);

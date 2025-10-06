@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ListFilter, User, Eye, Home, TrendingUp, BarChart3 } from 'lucide-react';
-import { CsvUploader } from '../../components/realtor/CsvUploader';
+import { ListFilter, User, Eye, Home, TrendingUp, BarChart3, Plus, X } from 'lucide-react';
+// CSV/Excel bulk upload removed by request
+// import { CsvUploader } from '../../components/realtor/CsvUploader';
 import { RealtorPropertyTable } from '../../components/realtor/RealtorPropertyTable';
 import { PropertyViewTracker } from '../../services/propertyViewTracker';
 // ...existing code...
@@ -13,6 +14,7 @@ import { useProperties } from '../../hooks/useProperties';
 import { useAuth } from '../../hooks/useAuth';
 import { useProfile } from '../../hooks/useProfile';
 import { Property } from '../../types';
+import { ListingUploader } from '../../components/realtor/ListingUploader';
 
 export function RealtorDashboard() {
   const { properties, refreshProperties } = useProperties();
@@ -23,6 +25,7 @@ export function RealtorDashboard() {
   // Statistics state
   const [totalViews, setTotalViews] = useState(0);
   const [statsLoading, setStatsLoading] = useState(true);
+  const [showAddListing, setShowAddListing] = useState(false);
   
   // Load property statistics
   useEffect(() => {
@@ -54,7 +57,6 @@ export function RealtorDashboard() {
     <main className="max-w-7xl mx-auto px-4 py-8">
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold">Dashboard</h1>
-        {/* Removed Afspraken button */}
       </div>
 
       {/* Profile Section */}
@@ -88,12 +90,14 @@ export function RealtorDashboard() {
           className="mb-8" 
         />
         
-        <CsvUploader />
+  {/* CSV/Excel bulk upload removed */}
         
         <div className="bg-white rounded-lg shadow-sm">
           <div className="p-6 border-b">
             <div className="flex items-center justify-between">
-              <h2 className="text-xl font-semibold">Mijn woningen</h2>
+              <div className="flex items-center gap-3">
+                <h2 className="text-xl font-semibold">Mijn woningen</h2>
+              </div>
               <div className="flex items-center gap-2">
                 <ListFilter className="w-5 h-5 text-gray-500" />
                 <select
@@ -108,6 +112,13 @@ export function RealtorDashboard() {
                   <option value="verhuurd">Verhuurd</option>
                   <option value="ingetrokken">Ingetrokken</option>
                 </select>
+                <button
+                  onClick={() => setShowAddListing(true)}
+                  className="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md shadow ml-2"
+                >
+                  <Plus className="w-4 h-4" />
+                  Nieuwe woning toevoegen
+                </button>
               </div>
             </div>
           </div>
@@ -166,7 +177,34 @@ export function RealtorDashboard() {
 
       </div>
 
-      {/* ListingUploader removed */}
+      {/* Add Listing Modal */}
+      {showAddListing && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/50" onClick={() => setShowAddListing(false)} />
+          <div className="relative z-10 w-full max-w-5xl max-h-[90vh] overflow-y-auto bg-white rounded-lg shadow-lg">
+            <div className="flex items-center justify-between p-4 border-b">
+              <h2 className="text-lg font-semibold">Nieuwe woning toevoegen</h2>
+              <button
+                onClick={() => setShowAddListing(false)}
+                className="p-2 rounded hover:bg-gray-100"
+                aria-label="Sluiten"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="p-4">
+              <ListingUploader
+                onClose={() => setShowAddListing(false)}
+                onSuccess={() => {
+                  setShowAddListing(false);
+                  // Optionally refresh properties after successful add
+                  try { refreshProperties(); } catch {}
+                }}
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 }

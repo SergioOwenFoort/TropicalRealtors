@@ -1,11 +1,5 @@
-import { createClient } from '@supabase/supabase-js';
 import { Property } from '../types';
-
-// Use your environment variables for security
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+import { supabase } from '../config/supabase.config';
 
 /**
  * Insert a property into the Supabase 'properties' table

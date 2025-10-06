@@ -6,11 +6,20 @@ const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Missing Supabase configuration. Please check your environment variables.');
+  const missing: string[] = [];
+  if (!supabaseUrl) missing.push('VITE_SUPABASE_URL');
+  if (!supabaseAnonKey) missing.push('VITE_SUPABASE_ANON_KEY');
+  throw new Error(
+    `Missing Supabase configuration: ${missing.join(', ')} not set. ` +
+      'In production, define these as Environment variables (e.g., Netlify → Site configuration → Build & deploy → Environment variables) and redeploy.'
+  );
 }
 
-// Create the client with anon key for regular user authentication
-export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
+// Ensure we only ever create ONE supabase client in the browser to avoid multiple GoTrueClient warnings
+// Reuse a global singleton if it exists (helps during HMR and multiple imports)
+const globalAny = globalThis as unknown as { __tr_supabase__?: ReturnType<typeof createClient<Database>> };
+
+const client = globalAny.__tr_supabase__ ?? createClient<Database>(supabaseUrl, supabaseAnonKey, {
   auth: {
     autoRefreshToken: true,
     persistSession: true,
@@ -29,3 +38,8 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
     },
   },
 });
+
+globalAny.__tr_supabase__ = client;
+
+// Create the client with anon key for regular user authentication
+export const supabase = client;

@@ -46,7 +46,8 @@ export default function emailServicePlugin(): Plugin {
 
               // Import templates dynamically
               const { emailTemplates } = await import('../utils/emailTemplates.js');
-              const template = emailTemplates[templateKey];
+              const key = String(templateKey) as keyof typeof emailTemplates;
+              const template = emailTemplates[key];
               
               if (!template) {
                 throw new Error(`Email template '${templateKey}' not found`);
@@ -127,7 +128,7 @@ export default function emailServicePlugin(): Plugin {
                 const { createClient } = await import('@supabase/supabase-js');
                 const supabase = createClient(
                   process.env.VITE_SUPABASE_URL || 'https://imhtjggudeidvmpgwjho.supabase.co',
-                  process.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImltaHRqZ2d1ZGVpZHZtcGd3amhvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg0OTc5NDIsImV4cCI6MjA2NDA3Mzk0Mn0.c1ULCJJDaHOOKp7Bb8uFV7r9LMJUz-sLIqvPLx4mNXU'
+                  process.env.VITE_SUPABASE_ANON_KEY || ''
                 );
 
                 console.log('🔄 Using Supabase fallback: sending new reset email');

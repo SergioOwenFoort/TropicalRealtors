@@ -7,10 +7,10 @@ const ALL_ISLANDS = [
   { key: 'saba', label: 'Saba' },
   { key: 'sinteustatius', label: 'Sint Eustatius' }
 ];
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Plus, Star, Edit, Building2, Users, Trash2, FileText, Settings, Database, UserCheck, Image as ImageIcon, BarChart3, Copy, Check } from 'lucide-react';
 import { PropertyStatusBadge } from '../../components/realtor/PropertyStatusBadge';
-import { useAllProperties } from '../../hooks/useProperties';
+import { useAllProperties, useProperties } from '../../hooks/useProperties';
 import { Property } from '../../types';
 import { UserManagement } from './UserManagement';
 import { CsvUploader } from '../../components/realtor/CsvUploader';
@@ -21,7 +21,7 @@ import { RealtorManagement } from '../../components/admin/RealtorManagement';
 import { CarouselManagement } from '../../components/admin/CarouselManagement';
 import { PropertyAnalytics } from '../../components/analytics/PropertyAnalytics';
 import { useUserRole } from '../../hooks/useUserRole';
-import { ListingUploader } from '../../components/realtor/ListingUploader';
+// import { ListingUploader } from '../../components/realtor/ListingUploader';
 
 type Tab = 'properties' | 'analytics' | 'users' | 'realtors' | 'carousel' | 'content' | 'tools' | 'maintenance';
 
@@ -56,7 +56,7 @@ export function AdminDashboard() {
   };
 
   // Helper to get enabled islands
-  const getEnabledIslands = () => ALL_ISLANDS.filter(i => islandVisibility[i.key]);
+  // const getEnabledIslands = () => ALL_ISLANDS.filter(i => islandVisibility[i.key]);
   const [carouselSearch, setCarouselSearch] = useState('');
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [propertySearch, setPropertySearch] = useState('');
@@ -79,7 +79,8 @@ export function AdminDashboard() {
     }
   };
   const navigate = useNavigate();
-  const { properties, loading, error } = useAllProperties();
+  const { properties } = useAllProperties();
+  const { deleteProperty, toggleFeatured } = useProperties();
   const [statusFilter, setStatusFilter] = useState<Property['status'] | 'alle'>('alle');
   const [islandFilter, setIslandFilter] = useState<string>('alle');
   const [activeTab, setActiveTab] = useState<Tab>('properties');
@@ -155,7 +156,13 @@ export function AdminDashboard() {
 
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Admin Dashboard</h1>
-        {/* Removed Nieuwe Woning button (ListingUploader) */}
+        <button
+          onClick={() => navigate('/admin/woning/nieuw')}
+          className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md shadow"
+        >
+          <Plus className="w-4 h-4" />
+          Nieuwe woning toevoegen
+        </button>
       </div>
 
       <div className="mb-6">
@@ -559,7 +566,7 @@ export function AdminDashboard() {
               </table>
             </div>
           </div>
-          {/* <ListingUploader /> removed, now only available via modal in CsvUploader */}
+          {/* ListingUploader available via dedicated route or modal */}
         </div>
       ) : activeTab === 'users' ? (
         <UserManagement />

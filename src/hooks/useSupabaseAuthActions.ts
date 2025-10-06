@@ -272,22 +272,17 @@ export function useSupabaseAuthActions() {
       const adminSession = localStorage.getItem('adminSession');
       
       if (adminSession) {
-        // Admin user - use service role to update password
-        const { supabaseAdmin } = await import('../config/supabaseAdmin');
         const session = JSON.parse(adminSession);
-        
-        console.log('Updating admin password via service role...');
-        
-        const { error } = await supabaseAdmin.auth.admin.updateUserById(
-          session.userId,
-          { password: newPassword }
-        );
-        
-        if (error) {
-          console.error('Admin password update failed:', error);
-          throw error;
+        console.log('Updating admin password via service role (server endpoint)...');
+        const resp = await fetch('/api/admin/update-password', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId: session.userId, newPassword })
+        });
+        if (!resp.ok) {
+          const msg = await resp.json().catch(() => ({}));
+          throw new Error(msg?.error || 'Failed to update admin password');
         }
-        
         console.log('Admin password updated successfully!');
       } else {
         // Regular user - use normal auth session

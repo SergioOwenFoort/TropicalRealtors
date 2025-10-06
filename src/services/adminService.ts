@@ -8,18 +8,14 @@ import dotenv from 'dotenv';
 // Load environment variables
 dotenv.config();
 
-// For TypeScript error handling
-function getErrorMessage(error: unknown): string {
-  if (error instanceof Error) return error.message;
-  return String(error);
-}
+type Result<T> = { success: true; data: T } | { success: false; message: string };
 
 // Load environment variables
 dotenv.config();
 
 // Get Supabase credentials
-const supabaseUrl = process.env.VITE_SUPABASE_URL || '';
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
+const supabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || '';
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY || '';
 
 if (!supabaseUrl || !supabaseServiceKey) {
   console.error('Missing Supabase credentials for admin operations');
@@ -34,7 +30,7 @@ const adminClient = createClient(supabaseUrl, supabaseServiceKey);
  * @param userId - The user ID to check
  * @returns true if user is admin, false otherwise
  */
-async function verifyAdmin(userId) {
+async function verifyAdmin(userId: string): Promise<boolean> {
   try {
     const { data, error } = await adminClient
       .from('profiles')
@@ -60,7 +56,11 @@ async function verifyAdmin(userId) {
  * @param targetUserId - The user whose password to reset
  * @param newPassword - The new password
  */
-export async function resetUserPassword(adminId, targetUserId, newPassword) {
+export async function resetUserPassword(
+  adminId: string,
+  targetUserId: string,
+  newPassword: string
+): Promise<Result<null>> {
   try {
     // First verify the requesting user is an admin
     const isAdmin = await verifyAdmin(adminId);
@@ -69,7 +69,7 @@ export async function resetUserPassword(adminId, targetUserId, newPassword) {
     }
     
     // Reset password using service role
-    const { data, error } = await adminClient.auth.admin.updateUserById(
+    const { error } = await adminClient.auth.admin.updateUserById(
       targetUserId,
       { password: newPassword }
     );
@@ -78,10 +78,11 @@ export async function resetUserPassword(adminId, targetUserId, newPassword) {
       throw new Error(`Failed to reset password: ${error.message}`);
     }
     
-    return { success: true, message: 'Password updated successfully' };
+  return { success: true, data: null };
   } catch (error) {
     console.error('Error resetting password:', error);
-    return { success: false, message: error.message };
+    const message = error instanceof Error ? error.message : String(error);
+    return { success: false, message };
   }
 }
 
@@ -89,7 +90,7 @@ export async function resetUserPassword(adminId, targetUserId, newPassword) {
  * List all users (admin only)
  * @param adminId - The ID of the admin making the request
  */
-export async function listAllUsers(adminId) {
+export async function listAllUsers(adminId: string): Promise<Result<any>> {
   try {
     // First verify the requesting user is an admin
     const isAdmin = await verifyAdmin(adminId);
@@ -104,10 +105,11 @@ export async function listAllUsers(adminId) {
       throw new Error(`Failed to list users: ${error.message}`);
     }
     
-    return { success: true, users: data.users };
+  return { success: true, data: data.users };
   } catch (error) {
     console.error('Error listing users:', error);
-    return { success: false, message: error.message };
+    const message = error instanceof Error ? error.message : String(error);
+    return { success: false, message };
   }
 }
 
@@ -118,7 +120,12 @@ export async function listAllUsers(adminId) {
  * @param password - Password for the new user
  * @param role - Role for the new user (default: user)
  */
-export async function createUser(adminId, email, password, role = 'user') {
+export async function createUser(
+  adminId: string,
+  email: string,
+  password: string,
+  role = 'user'
+): Promise<Result<any>> {
   try {
     // First verify the requesting user is an admin
     const isAdmin = await verifyAdmin(adminId);
@@ -148,10 +155,11 @@ export async function createUser(adminId, email, password, role = 'user') {
       });
     }
     
-    return { success: true, user: data.user };
+  return { success: true, data: data.user };
   } catch (error) {
     console.error('Error creating user:', error);
-    return { success: false, message: error.message };
+    const message = error instanceof Error ? error.message : String(error);
+    return { success: false, message };
   }
 }
 

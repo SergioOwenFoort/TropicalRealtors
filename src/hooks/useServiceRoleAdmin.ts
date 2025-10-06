@@ -3,9 +3,6 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '../config/supabase.config';
-import { supabaseAdmin } from '../config/supabaseAdmin';
-
-const ADMIN_EMAIL = import.meta.env.VITE_ADMIN_EMAIL;
 const SESSION_KEY = 'adminSession';
 
 export const useServiceRoleAdmin = () => {
@@ -21,26 +18,26 @@ export const useServiceRoleAdmin = () => {
     try {
       console.log('Using pure service role approach for admin login');
       
-      // Step 1: Use the check_admin_credentials RPC via service role
-      const { data: credentialCheck, error: credentialError } = await supabaseAdmin.rpc(
-        'check_admin_credentials',
-        { admin_email: email, admin_password: password }
-      );
-      
-      console.log('Credential check result:', credentialCheck);
-      
-      if (credentialError || !credentialCheck?.success) {
-        setError(credentialError?.message || credentialCheck?.message || 'Invalid credentials');
+      // Step 1: use server endpoint to validate credentials with service role
+      const resp = await fetch('/api/admin/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+      if (!resp.ok) {
+        const msg = await resp.json().catch(() => ({}));
+        setError(msg?.error || 'Invalid credentials');
         setIsAuthenticated(false);
         setIsLoading(false);
         return false;
       }
+      const credentialCheck = await resp.json();
       
       // Completely skip the regular auth for admin - this avoids the 500 error entirely
       
       // Step 2: Store admin session info in localStorage
       const adminSession = {
-        userId: credentialCheck.user_id,
+        userId: credentialCheck.userId || credentialCheck.user_id,
         email: email,
         isAdmin: true,
         loginTime: new Date().toISOString()
@@ -78,13 +75,9 @@ export const useServiceRoleAdmin = () => {
     
     if (session) {
       // If we have a session, check if the user is an admin
-      const { data: profile, error } = await supabaseAdmin
-        .from('profiles')
-        .select('role')
-        .eq('id', session.user.id)
-        .single();
-      
-      if (!error && profile?.role === 'admin') {
+      // Ask server to validate admin role for the current user (optional future improvement)
+      // For now, rely on local admin session if present
+      if (session.user.email === import.meta.env.VITE_ADMIN_EMAIL) {
         setIsAuthenticated(true);
         return true;
       }
