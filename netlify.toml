@@ -10,12 +10,6 @@
   to = "/index.html"
   status = 200
 
-# Ensure any request to /favicon.ico serves the tropical favicon PNG
-[[redirects]]
-  from = "/favicon.ico"
-  to = "/tropical-favicon.png"
-  status = 200
-  force = true
 
 [[headers]]
   for = "/*"
