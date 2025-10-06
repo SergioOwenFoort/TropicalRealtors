@@ -7,6 +7,7 @@ import { toast } from 'react-hot-toast';
 import { UserRole } from '../../types';
 import { SupabaseService } from '../../services/supabaseService';
 import { supabase } from '../../config/supabase.config';
+import { Logo } from '../../components/ui/Logo';
 
 export function RegisterPage() {
   const [name, setName] = useState('');
@@ -80,7 +81,7 @@ export function RegisterPage() {
       <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-lg shadow-sm">
         <div className="flex justify-between items-center">
           <Link to="/" className="text-gray-600 hover:text-blue-600">
-            <Home className="w-6 h-6" />
+            <Logo className="w-6 h-6" />
           </Link>
           <h2 className="text-center text-3xl font-bold text-gray-900">Account aanmaken</h2>
           <div className="w-6" />

@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { LogIn, Mail, Lock, Home, AlertCircle, Eye, EyeOff } from 'lucide-react';
+import { LogIn, Mail, Lock, AlertCircle, Eye, EyeOff } from 'lucide-react';
 import { useSupabaseAuthActions as useAuthActions } from '../../hooks/useSupabaseAuthActions';
 import { useAuth } from '../../hooks/useAuth';
+import { Logo } from '../../components/ui/Logo';
 
 export function LoginPage() {
   const [email, setEmail] = useState('');
@@ -43,14 +44,14 @@ export function LoginPage() {
       <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-lg shadow-sm">
         <div className="flex justify-between items-center">
           <Link to="/" className="text-gray-600 hover:text-blue-600">
-            <Home className="w-6 h-6" />
+            <Logo className="w-6 h-6" />
           </Link>
           <h2 className="text-center text-3xl font-bold text-gray-900">Inloggen</h2>
           <div className="w-6" />
         </div>
 
         <p className="mt-2 text-center text-sm text-gray-600">
-          Welkom bij Bonaire Makelaars
+          Welcome at TropicalRealtors.com
         </p>
 
         {error && (

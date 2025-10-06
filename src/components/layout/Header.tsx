@@ -5,6 +5,7 @@ import { AuthMenu } from '../auth/AuthMenu';
 import { useAuth } from '../../hooks/useAuth';
 import { useUserRole } from '../../hooks/useUserRole';
 import { SearchBar } from '../ui/SearchBar';
+import { Logo } from '../ui/Logo';
 
 export function Header() {
   const { user } = useAuth();
@@ -26,9 +27,9 @@ export function Header() {
           <div className="flex items-center justify-between gap-8">
 
             <Link to="/" className="flex items-center gap-3" onClick={closeAllMenus}>
-              {/* Removed the logo image */}
+              <Logo className="w-8 h-8" />
               <div>
-                <span className="text-xl font-bold text-gray-900">ABCMakelaars</span>
+                <span className="text-xl font-bold text-gray-900">TropicalRealtors</span>
                 <span className="text-xl font-bold text-blue-600">.com</span>
               </div>
             </Link>
