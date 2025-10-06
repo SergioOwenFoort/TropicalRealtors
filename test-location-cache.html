@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Location Detection Cache Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-result { margin: 10px 0; padding: 10px; border-radius: 5px; }
+        .success { background-color: #d4edda; color: #155724; }
+        .info { background-color: #d1ecf1; color: #0c5460; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>Location Detection Cache Test</h1>
+    
+    <button onclick="testLocationDetection()">Test Location Detection</button>
+    <button onclick="clearCache()">Clear Cache</button>
+    <button onclick="showCache()">Show Cache</button>
+    
+    <div id="results"></div>
+
+    <script type="module">
+        // Import the location detection function
+        import { detectUserIsland } from './src/utils/locationDetection.ts';
+        
+        window.detectUserIsland = detectUserIsland;
+        
+        window.testLocationDetection = async function() {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '<div class="info">Testing location detection...</div>';
+            
+            console.log('=== LOCATION DETECTION TEST ===');
+            const startTime = Date.now();
+            
+            try {
+                // Test multiple calls to see if caching works
+                const promises = [
+                    detectUserIsland(),
+                    detectUserIsland(),
+                    detectUserIsland()
+                ];
+                
+                const results = await Promise.all(promises);
+                const endTime = Date.now();
+                
+                resultsDiv.innerHTML = `
+                    <div class="success">✅ Location detection completed!</div>
+                    <div class="info">
+                        <strong>Results:</strong><br>
+                        • Island 1: ${results[0]}<br>
+                        • Island 2: ${results[1]}<br>
+                        • Island 3: ${results[2]}<br>
+                        • All identical: ${results.every(r => r === results[0]) ? 'Yes' : 'No'}<br>
+                        • Time taken: ${endTime - startTime}ms
+                    </div>
+                `;
+                
+                console.log('Detection results:', results);
+                console.log('Time taken:', endTime - startTime, 'ms');
+                
+            } catch (error) {
+                console.error('Location detection failed:', error);
+                resultsDiv.innerHTML = `<div style="background-color: #f8d7da; color: #721c24; padding: 10px; border-radius: 5px;">❌ Error: ${error.message}</div>`;
+            }
+        };
+        
+        window.clearCache = function() {
+            localStorage.removeItem('tropicalrealtors_location_cache');
+            document.getElementById('results').innerHTML = '<div class="info">✅ Cache cleared!</div>';
+            console.log('Location cache cleared');
+        };
+        
+        window.showCache = function() {
+            const cache = localStorage.getItem('tropicalrealtors_location_cache');
+            const resultsDiv = document.getElementById('results');
+            
+            if (cache) {
+                try {
+                    const parsed = JSON.parse(cache);
+                    const age = Date.now() - parsed.timestamp;
+                    const ageHours = Math.round(age / (1000 * 60 * 60) * 100) / 100;
+                    
+                    resultsDiv.innerHTML = `
+                        <div class="info">
+                            <strong>Cached Location Data:</strong><br>
+                            • Island: ${parsed.island}<br>
+                            • Country: ${parsed.detectedCountry || 'Unknown'}<br>
+                            • Method: ${parsed.detectionMethod}<br>
+                            • Reason: ${parsed.reason}<br>
+                            • Age: ${ageHours} hours<br>
+                            • Timestamp: ${new Date(parsed.timestamp).toLocaleString()}
+                        </div>
+                    `;
+                } catch (error) {
+                    resultsDiv.innerHTML = '<div style="background-color: #f8d7da; color: #721c24; padding: 10px; border-radius: 5px;">❌ Invalid cache data</div>';
+                }
+            } else {
+                resultsDiv.innerHTML = '<div class="info">No cache data found</div>';
+            }
+        };
+    </script>
+</body>
+</html>

@@ -4,13 +4,13 @@ import { Globe2, Shield, HeartHandshake, Search } from 'lucide-react';
 const FEATURES = [
   {
     icon: Globe2,
-    title: 'Europees Netwerk',
-    description: 'Toegang tot duizenden woningen in heel Europa via ons uitgebreide netwerk van makelaars.'
+    title: 'Caribisch Netwerk',
+    description: 'Toegang tot honderden woningen, hotels en resorts via ons uitgebreid netwerk'
   },
   {
     icon: Shield,
     title: 'Veilig & Betrouwbaar',
-    description: 'Alle makelaars zijn geverifieerd en woningen worden zorgvuldig gecontroleerd.'
+    description: 'Alle deelnemende partijen worden gecontroleerd'
   },
   {
     icon: HeartHandshake,
@@ -29,9 +29,9 @@ export function WhyChooseUs() {
     <section className="py-12 px-4 bg-gray-50">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold mb-4">Waarom Woningaanbod.eu?</h2>
+          <h2 className="text-3xl font-bold mb-4">Waarom TropicalRealtors.com?</h2>
           <p className="text-gray-600 max-w-2xl mx-auto">
-            Wij maken het vinden van uw droomhuis in Europa eenvoudig en betrouwbaar
+            Wij maken het vinden van uw droomhuis in het Caribisch gebied mogelijk
           </p>
         </div>
         
