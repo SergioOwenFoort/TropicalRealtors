@@ -8,13 +8,13 @@
   "background_color": "#ffffff",
   "icons": [
     {
-      "src": "/tropicalrealtors-favicon-20251006.png",
+      "src": "/tropical-favicon.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "/tropicalrealtors-favicon-20251006.png",
+      "src": "/tropical-favicon.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
