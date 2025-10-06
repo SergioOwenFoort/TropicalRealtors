@@ -1,0 +1,23 @@
+{
+  "name": "TropicalRealtors.com",
+  "short_name": "TropicalRealtors",
+  "description": "Caribbean Real Estate Platform",
+  "start_url": "/",
+  "display": "standalone",
+  "theme_color": "#2563eb",
+  "background_color": "#ffffff",
+  "icons": [
+    {
+      "src": "/tropical-favicon.png?v=4",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/tropical-favicon.png?v=4",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
