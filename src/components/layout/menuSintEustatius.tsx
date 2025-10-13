@@ -111,6 +111,10 @@ export function MenuSintEustatius() {
                 Alle woningen
               </Link>
 
+              <Link to="/vakantie" className="text-gray-600 hover:text-blue-600">
+                Vakantie
+              </Link>
+
               <Link to="/makelaars" className="text-gray-600 hover:text-blue-600">
                 Makelaars
               </Link>
@@ -235,6 +239,13 @@ export function MenuSintEustatius() {
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 Alle woningen
+              </Link>
+              <Link
+                to="/vakantie"
+                className="block py-2 text-gray-600"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Vakantie
               </Link>
               <Link
                 to="/makelaars"

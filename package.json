@@ -1,7 +1,7 @@
 {
-  "name": "bonairemakelaars.com",
+  "name": "tropicalrealtors.com",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "homepage": "https://SergioOwenFoort.github.io/tropicalrealtors.com",
   "scripts": {
@@ -12,7 +12,9 @@
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d dist"
+    "deploy": "gh-pages -d dist",
+    "deploy:netlify": "npm run build && netlify deploy --prod --dir=dist",
+    "deploy:netlify:preview": "npm run build && netlify deploy --dir=dist"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.55.0",
@@ -36,6 +38,7 @@
     "gh-pages": "^6.3.0",
     "icojs": "^0.19.5",
     "jimp": "^1.6.0",
+    "netlify-cli": "^17.0.0",
     "sharp": "^0.33.4",
     "png-to-ico": "^3.0.1",
     "postcss": "^8.5.6",

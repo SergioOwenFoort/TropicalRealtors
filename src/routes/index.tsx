@@ -3,6 +3,7 @@ import { Layout } from '../components/layout/Layout';
 import { HomePage } from '../pages/HomePage';
 import { PropertyPage } from '../pages/PropertyPage';
 import { SearchResultsPage } from '../pages/SearchResultsPage';
+import { VakantiePage } from '../pages/VakantiePage';
 import { MakelaarsPage } from '../pages/MakelaarsWrapper';
 import { AuthGuard } from '../components/auth/AuthGuard';
 import { DashboardRouter } from '../components/auth/DashboardRouter';
@@ -70,6 +71,10 @@ export const router = createBrowserRouter([
           {
             path: 'zoeken',
             element: <SearchResultsPage />,
+          },
+          {
+            path: 'vakantie',
+            element: <VakantiePage />,
           },
           {
             path: 'makelaars',
