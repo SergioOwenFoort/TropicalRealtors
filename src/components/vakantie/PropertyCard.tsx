@@ -1,5 +1,6 @@
 import { Star, MapPin, Wifi, Car, Waves, Coffee, Shield, Heart, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 
 export interface VacationProperty {
   id: string;
@@ -76,18 +77,19 @@ export function PropertyCard({ property }: PropertyCardProps) {
   const remainingAmenitiesCount = property.amenities.length - 4;
 
   return (
-    <div className="bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden group">
-      {/* Image Carousel */}
-      <div className="relative h-48 overflow-hidden">
-        <img
-          src={property.images[currentImageIndex] || 'https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?w=400&h=300&fit=crop&auto=format'}
-          alt={property.name}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-          onError={(e) => {
-            const target = e.target as HTMLImageElement;
-            target.src = 'https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?w=400&h=300&fit=crop&auto=format';
-          }}
-        />
+    <Link to={`/vakantie/${property.id}`} className="block">
+      <div className="bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden group cursor-pointer">
+        {/* Image Carousel */}
+        <div className="relative h-48 overflow-hidden">
+          <img
+            src={property.images[currentImageIndex] || 'https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?w=400&h=300&fit=crop&auto=format'}
+            alt={property.name}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            onError={(e) => {
+              const target = e.target as HTMLImageElement;
+              target.src = 'https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?w=400&h=300&fit=crop&auto=format';
+            }}
+          />
         
         {/* Image Navigation */}
         {property.images.length > 1 && (
@@ -221,6 +223,7 @@ export function PropertyCard({ property }: PropertyCardProps) {
           </button>
         </div>
       </div>
-    </div>
+      </div>
+    </Link>
   );
 }

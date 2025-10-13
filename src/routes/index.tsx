@@ -4,6 +4,7 @@ import { HomePage } from '../pages/HomePage';
 import { PropertyPage } from '../pages/PropertyPage';
 import { SearchResultsPage } from '../pages/SearchResultsPage';
 import { VakantiePage } from '../pages/VakantiePage';
+import { VacationPropertyPage } from '../pages/VacationPropertyPage';
 import { MakelaarsPage } from '../pages/MakelaarsWrapper';
 import { AuthGuard } from '../components/auth/AuthGuard';
 import { DashboardRouter } from '../components/auth/DashboardRouter';
@@ -75,6 +76,10 @@ export const router = createBrowserRouter([
           {
             path: 'vakantie',
             element: <VakantiePage />,
+          },
+          {
+            path: 'vakantie/:id',
+            element: <VacationPropertyPage />,
           },
           {
             path: 'makelaars',
