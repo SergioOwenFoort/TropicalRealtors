@@ -17,18 +17,35 @@ export class MessageService {
         .eq('id', data.property_id)
         .single();
 
+      // Get user profile for sender info
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('display_name, email')
+        .eq('id', user.id)
+        .single();
+
+      // Get recipient profile info  
+      const { data: recipientProfile } = await supabase
+        .from('profiles')
+        .select('display_name, email')
+        .eq('id', data.recipient_id)
+        .single();
+
       const messageData = {
         property_id: data.property_id,
+        property_title: property?.title || 'Eigendom',
         sender_id: user.id,
         recipient_id: data.recipient_id,
+        sender_name: profile?.display_name || 'Onbekend',
+        sender_email: profile?.email || user.email || '',
+        recipient_name: recipientProfile?.display_name || 'Onbekend',
+        recipient_email: recipientProfile?.email || '',
         subject: data.subject || `Vraag over: ${property?.title || 'Eigendom'}`,
         message: data.message,
         message_type: data.message_type || 'inquiry',
-        contact_info: {
-          viewing_date: data.viewing_date || null,
-          viewing_time: data.viewing_time || null,
-          viewing_notes: data.viewing_notes || null,
-        },
+        viewing_date: data.viewing_date || null,
+        viewing_time: data.viewing_time || null,
+        viewing_notes: data.viewing_notes || null,
       };
 
       const { data: result, error } = await supabase
@@ -347,5 +364,205 @@ export class MessageService {
         }
       )
       .subscribe();
+  }
+
+  // Get conversations grouped by participants and property
+  static async getConversations(
+    filters: MessageFilters = {}
+  ): Promise<{ success: boolean; conversations?: any[]; error?: string }> {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        return { success: false, error: 'User not authenticated' };
+      }
+
+      // Get all messages for the user - using only core fields that definitely exist
+      let query = supabase
+        .from('messages')
+        .select(`
+          id,
+          property_id,
+          sender_id,
+          recipient_id,
+          subject,
+          message,
+          message_type,
+          status,
+          created_at,
+          updated_at
+        `);
+
+      // Filter by user (either sender or recipient)
+      if (filters.folder === 'sent') {
+        query = query.eq('sender_id', user.id);
+      } else if (filters.folder === 'archived') {
+        query = query
+          .or(`sender_id.eq.${user.id},recipient_id.eq.${user.id}`)
+          .eq('status', 'archived');
+      } else {
+        // inbox or all
+        query = query.or(`sender_id.eq.${user.id},recipient_id.eq.${user.id}`);
+      }
+
+      // Apply additional filters
+      if (filters.status) {
+        query = query.eq('status', filters.status);
+      }
+      if (filters.message_type) {
+        query = query.eq('message_type', filters.message_type);
+      }
+
+      const { data: messages, error } = await query
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Error fetching messages:', error);
+        return { success: false, error: error.message };
+      }
+
+      // Group messages into conversations
+      const conversationMap = new Map();
+
+      // Get property and user info for the conversations
+      const propertyIds = [...new Set(messages?.map(m => m.property_id))];
+      const userIds = [...new Set(messages?.flatMap(m => [m.sender_id, m.recipient_id]))];
+
+      // Fetch property titles
+      const { data: properties } = await supabase
+        .from('properties')
+        .select('id, title')
+        .in('id', propertyIds);
+
+      // Fetch user profiles
+      const { data: profiles } = await supabase
+        .from('profiles')
+        .select('id, display_name')
+        .in('id', userIds);
+
+      // Create lookup maps
+      const propertyMap = new Map(properties?.map(p => [p.id, p.title]) || []);
+      const profileMap = new Map(profiles?.map(p => [p.id, p.display_name || 'Onbekend']) || []);
+
+      messages?.forEach(message => {
+        // Create a conversation key based on property and participants
+        const participants = [message.sender_id, message.recipient_id].sort();
+        const conversationKey = `${message.property_id}|${participants.join('|')}`;
+        
+        if (!conversationMap.has(conversationKey)) {
+          conversationMap.set(conversationKey, {
+            id: conversationKey,
+            property_id: message.property_id,
+            property_title: propertyMap.get(message.property_id) || 'Eigendom',
+            participants: participants,
+            participant_names: {
+              [message.sender_id]: profileMap.get(message.sender_id) || 'Onbekend',
+              [message.recipient_id]: profileMap.get(message.recipient_id) || 'Onbekend'
+            },
+            messages: [],
+            lastMessage: null,
+            unreadCount: 0,
+            totalMessages: 0,
+            created_at: message.created_at,
+            updated_at: message.created_at
+          });
+        }
+
+        const conversation = conversationMap.get(conversationKey);
+        conversation.messages.push(message);
+        conversation.totalMessages++;
+        
+        // Update last message if this is more recent
+        if (!conversation.lastMessage || new Date(message.created_at) > new Date(conversation.lastMessage.created_at)) {
+          conversation.lastMessage = message;
+          conversation.updated_at = message.created_at;
+        }
+
+        // Count unread messages for current user
+        if (message.status === 'unread' && message.recipient_id === user.id) {
+          conversation.unreadCount++;
+        }
+      });
+
+      // Convert map to array and sort by last message date
+      const conversations = Array.from(conversationMap.values())
+        .sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime());
+
+      return { success: true, conversations };
+    } catch (error) {
+      console.error('Error in getConversations:', error);
+      return { success: false, error: 'Failed to fetch conversations' };
+    }
+  }
+
+  // Get messages for a specific conversation
+  static async getConversationMessages(
+    conversationId: string
+  ): Promise<{ success: boolean; messages?: Message[]; error?: string }> {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        return { success: false, error: 'User not authenticated' };
+      }
+
+      // Parse conversation ID to get property and participants
+      // Format: propertyId|participant1UUID|participant2UUID
+      const parts = conversationId.split('|');
+      const propertyId = parts[0];
+      const participants = parts.slice(1);
+
+      const { data: messages, error } = await supabase
+        .from('messages')
+        .select(`
+          id,
+          property_id,
+          sender_id,
+          recipient_id,
+          subject,
+          message,
+          message_type,
+          status,
+          created_at,
+          updated_at
+        `)
+        .eq('property_id', propertyId)
+        .or(`sender_id.in.(${participants.map(p => `"${p}"`).join(',')}),recipient_id.in.(${participants.map(p => `"${p}"`).join(',')})`)
+        .order('created_at', { ascending: true });
+
+      if (error) {
+        console.error('Error fetching conversation messages:', error);
+        return { success: false, error: error.message };
+      }
+
+      // Enhance messages with property and user info
+      if (messages && messages.length > 0) {
+        // Get property info
+        const { data: property } = await supabase
+          .from('properties')
+          .select('id, title')
+          .eq('id', propertyId)
+          .single();
+
+        // Get user profiles
+        const userIds = [...new Set(messages.flatMap(m => [m.sender_id, m.recipient_id]))];
+        const { data: profiles } = await supabase
+          .from('profiles')
+          .select('id, display_name')
+          .in('id', userIds);
+
+        const profileMap = new Map(profiles?.map(p => [p.id, p.display_name || 'Onbekend']) || []);
+
+        // Enhance each message
+        messages.forEach(message => {
+          (message as any).property_title = property?.title || 'Eigendom';
+          (message as any).sender_name = profileMap.get(message.sender_id) || 'Onbekend';
+          (message as any).recipient_name = profileMap.get(message.recipient_id) || 'Onbekend';
+        });
+      }
+
+      return { success: true, messages: messages || [] };
+    } catch (error) {
+      console.error('Error in getConversationMessages:', error);
+      return { success: false, error: 'Failed to fetch conversation messages' };
+    }
   }
 }

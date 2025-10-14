@@ -13,15 +13,13 @@ import {
   ChevronRight,
   Users,
   Calendar,
-  Phone,
-  Mail,
   Share2,
-  Check,
-  X,
-  ExternalLink
+  Check
 } from 'lucide-react';
 import { vacationProperties } from '../data/vacationProperties';
 import { VacationProperty } from '../components/vakantie/PropertyCard';
+import { VacationPropertyContact } from '../components/vakantie/VacationPropertyContact';
+
 
 const amenityIcons: { [key: string]: any } = {
   wifi: Wifi,
@@ -246,6 +244,7 @@ export function VacationPropertyPage() {
                     <button
                       key={index}
                       onClick={() => setCurrentImageIndex(index)}
+                      aria-label={`Bekijk afbeelding ${index + 1}`}
                       className={`w-2 h-2 rounded-full transition-all ${
                         index === currentImageIndex ? 'bg-white' : 'bg-white/50'
                       }`}
@@ -348,7 +347,7 @@ export function VacationPropertyPage() {
 
           {/* Booking Sidebar */}
           <div className="lg:col-span-1">
-            <div className="sticky top-24">
+            <div>
               <div className="bg-white rounded-xl shadow-lg p-6">
                 <div className="mb-6">
                   <div className="flex items-baseline gap-2 mb-2">
@@ -450,27 +449,11 @@ export function VacationPropertyPage() {
                 <p className="text-xs text-gray-500 text-center mb-4">
                   Je wordt pas belast na bevestiging
                 </p>
-
-                {/* Contact Information */}
-                <div className="border-t border-gray-200 pt-4">
-                  <h3 className="font-semibold text-gray-900 mb-3">Contact</h3>
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2 text-sm text-gray-600">
-                      <Phone className="w-4 h-4" />
-                      <span>+599 123 4567</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm text-gray-600">
-                      <Mail className="w-4 h-4" />
-                      <span>info@tropicalrealtors.com</span>
-                    </div>
-                    <button className="flex items-center gap-2 text-sm text-blue-600 hover:text-blue-700">
-                      <ExternalLink className="w-4 h-4" />
-                      <span>Website bezoeken</span>
-                    </button>
-                  </div>
-                </div>
               </div>
             </div>
+            
+            {/* Contact Component */}
+            <VacationPropertyContact property={property} disableSticky={true} />
           </div>
         </div>
       </div>

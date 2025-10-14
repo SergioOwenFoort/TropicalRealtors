@@ -68,7 +68,7 @@ export interface CarouselSlideInput {
   created_by?: string;
 }
 
-export type UserRole = 'user' | 'realtor' | 'owner' | 'admin';
+export type UserRole = 'user' | 'realtor' | 'horo' | 'owner' | 'admin';
 
 export interface ApiResponse {
   success: boolean;
@@ -96,14 +96,25 @@ export interface PropertyFilters {
 export interface Message {
   id: string;
   property_id: string;
+  property_title?: string;
   sender_id: string;
   recipient_id: string;
+  sender_name?: string;
+  sender_email?: string;
+  recipient_name?: string;
+  recipient_email?: string;
   subject: string;
   message: string;
   message_type: 'inquiry' | 'viewing_request' | 'general';
   status: 'unread' | 'read' | 'replied' | 'archived';
+  viewing_date?: string;
+  viewing_time?: string;
+  viewing_notes?: string;
+  contact_info?: any;
   created_at: string;
   updated_at: string;
+  read_at?: string;
+  replied_at?: string;
 }
 
 export interface SendMessageRequest {
@@ -112,10 +123,13 @@ export interface SendMessageRequest {
   message: string;
   message_type: 'inquiry' | 'viewing_request' | 'general';
   subject?: string;
+  viewing_date?: string;
+  viewing_time?: string;
+  viewing_notes?: string;
 }
 
 export interface MessageFilters {
-  folder?: 'inbox' | 'sent' | 'all';
+  folder?: 'inbox' | 'sent' | 'all' | 'archived';
   status?: 'unread' | 'read' | 'replied' | 'archived';
   message_type?: 'inquiry' | 'viewing_request' | 'general';
 }
