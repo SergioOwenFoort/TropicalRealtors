@@ -26,6 +26,7 @@ import { useUserRole } from '../../hooks/useUserRole';
 type Tab = 'properties' | 'analytics' | 'users' | 'realtors' | 'carousel' | 'content' | 'tools' | 'maintenance';
 
 export function AdminDashboard() {
+  console.log('AdminDashboard rendering');
   // Island visibility state (localStorage for persistence)
   const [islandVisibility, setIslandVisibility] = useState<{[key: string]: boolean}>({});
   const [isDirty, setIsDirty] = useState(false);
@@ -212,6 +213,7 @@ export function AdminDashboard() {
               <UserCheck className="w-4 h-4" />
               Makelaars
             </button>
+
             <button
               onClick={() => setActiveTab('carousel')}
               className={`${

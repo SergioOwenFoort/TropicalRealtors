@@ -8,7 +8,7 @@ import { useProfile } from '../../hooks/useProfile';
 import { useSavedSearches } from '../../hooks/useSavedSearches';
 import { usePaginatedFavorites } from '../../hooks/usePaginatedFavorites';
 import { LoadingSpinner } from '../../components/LoadingSpinner';
-import { SimpleMessagesDashboard } from '../../components/messages/SimpleMessagesDashboard';
+import { ConversationsDashboard } from '../../components/messages/ConversationsDashboard';
 
 export function UserDashboard() {
   const { user } = useAuth();
@@ -107,7 +107,7 @@ export function UserDashboard() {
           </button>
         </div>
         {isMessagesExpanded && (
-          <SimpleMessagesDashboard />
+          <ConversationsDashboard />
         )}
       </div>
 

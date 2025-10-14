@@ -10,7 +10,7 @@ import { PropertyCard } from '../../components/ui/PropertyCard';
 import { OwnerPropertyTable } from '../../components/owner/OwnerPropertyTable';
 import { CarouselManagement } from '../../components/admin/CarouselManagement';
 import { LoadingSpinner } from '../../components/LoadingSpinner';
-import { SimpleMessagesDashboard } from '../../components/messages/SimpleMessagesDashboard';
+import { ConversationsDashboard } from '../../components/messages/ConversationsDashboard';
 import { useEffect, useState } from 'react';
 
 export function OwnerDashboard() {
@@ -97,7 +97,7 @@ export function OwnerDashboard() {
           </button>
         </div>
         {isMessagesExpanded && (
-          <SimpleMessagesDashboard />
+          <ConversationsDashboard />
         )}
       </div>
 
