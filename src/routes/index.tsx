@@ -18,6 +18,7 @@ import { OwnerListingUploader } from '../pages/owner/OwnerListingUploader';
 import { AdminDashboard } from '../pages/admin/AdminDashboard';
 import { AdminProfilePage } from '../pages/admin/AdminProfilePage';
 import { BusinessDashboard } from '../pages/business/BusinessDashboard';
+import { HoroDashboard } from '../pages/horo/HoroDashboard';
 import { LoginPage } from '../pages/auth/LoginPage';
 import { RegisterPage } from '../pages/auth/RegisterPage';
 import { ResetPasswordPage } from '../pages/auth/ResetPasswordPage';
@@ -218,6 +219,30 @@ export const router = createBrowserRouter([
             element: (
               <AuthGuard requireBusiness>
                 <PropertyForm businessMode />
+              </AuthGuard>
+            ),
+          },
+          {
+            path: 'horo',
+            element: (
+              <AuthGuard requireHoro>
+                <HoroDashboard />
+              </AuthGuard>
+            ),
+          },
+          {
+            path: 'horo/woning/nieuw',
+            element: (
+              <AuthGuard requireHoro>
+                <PropertyForm />
+              </AuthGuard>
+            ),
+          },
+          {
+            path: 'horo/woning/:id/bewerken',
+            element: (
+              <AuthGuard requireHoro>
+                <PropertyForm />
               </AuthGuard>
             ),
           },

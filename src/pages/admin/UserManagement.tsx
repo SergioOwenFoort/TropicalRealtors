@@ -37,7 +37,7 @@ function EditRoleModal({ user, isOpen, onClose, onSave }: EditRoleModalProps) {
         <h3 className="text-lg font-semibold mb-4">Rol wijzigen voor {user.display_name || user.email}</h3>
         
         <div className="space-y-3 mb-6">
-          {(['admin', 'realtor', 'owner', 'user'] as UserRole[]).map((role) => (
+          {(['admin', 'realtor', 'horo', 'owner', 'user'] as UserRole[]).map((role) => (
             <label key={role} className="flex items-center gap-3 cursor-pointer">
               <input
                 type="radio"
@@ -52,6 +52,8 @@ function EditRoleModal({ user, isOpen, onClose, onSave }: EditRoleModalProps) {
                     ? 'bg-purple-100 text-purple-600'
                     : role === 'realtor'
                     ? 'bg-blue-100 text-blue-600'
+                    : role === 'horo'
+                    ? 'bg-purple-100 text-purple-600'
                     : role === 'owner'
                     ? 'bg-green-100 text-green-600'
                     : 'bg-gray-100 text-gray-600'
@@ -60,6 +62,8 @@ function EditRoleModal({ user, isOpen, onClose, onSave }: EditRoleModalProps) {
                     <Shield className="w-4 h-4" />
                   ) : role === 'realtor' ? (
                     <Building2 className="w-4 h-4" />
+                  ) : role === 'horo' ? (
+                    <Building2 className="w-4 h-4" />
                   ) : role === 'owner' ? (
                     <Building2 className="w-4 h-4" />
                   ) : (
@@ -67,7 +71,7 @@ function EditRoleModal({ user, isOpen, onClose, onSave }: EditRoleModalProps) {
                   )}
                 </div>
                 <span className="capitalize font-medium">
-                  {role === 'owner' ? 'Home Owner' : role}
+                  {role === 'owner' ? 'Home Owner' : role === 'horo' ? 'HoRe' : role}
                 </span>
               </div>
             </label>
@@ -235,7 +239,7 @@ export function UserManagement() {
 
       <div className="p-4 border-b bg-gray-50">
         <div className="flex gap-2">
-          {(['all', 'admin', 'realtor', 'owner', 'user'] as const).map((role) => (
+          {(['all', 'admin', 'realtor', 'horo', 'owner', 'user'] as const).map((role) => (
             <button
               key={role}
               onClick={() => setRoleFilter(role)}
@@ -245,7 +249,7 @@ export function UserManagement() {
                   : 'bg-white text-gray-600 hover:bg-gray-100'
               }`}
             >
-              {role === 'all' ? 'Alle gebruikers' : role === 'owner' ? 'Home Owner' : role.charAt(0).toUpperCase() + role.slice(1)}
+              {role === 'all' ? 'Alle gebruikers' : role === 'owner' ? 'Home Owner' : role === 'horo' ? 'HoRe' : role.charAt(0).toUpperCase() + role.slice(1)}
               {role !== 'all' && (
                 <span className="ml-1 text-xs opacity-75">
                   ({users.filter(u => {

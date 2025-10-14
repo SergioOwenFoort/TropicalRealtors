@@ -15,7 +15,7 @@ export interface Database {
           email: string
           display_name: string
           avatar_url: string | null
-          role: 'user' | 'realtor' | 'owner' | 'admin'
+          role: 'user' | 'realtor' | 'horo' | 'owner' | 'admin'
           created_at: string
           updated_at: string | null
           favorites: string[]
@@ -25,7 +25,7 @@ export interface Database {
           email: string
           display_name: string
           avatar_url?: string | null
-          role?: 'user' | 'realtor' | 'owner' | 'admin'
+          role?: 'user' | 'realtor' | 'horo' | 'owner' | 'admin'
           created_at?: string
           updated_at?: string | null
           favorites?: string[]
@@ -35,7 +35,7 @@ export interface Database {
           email?: string
           display_name?: string
           avatar_url?: string | null
-          role?: 'user' | 'realtor' | 'owner' | 'admin'
+          role?: 'user' | 'realtor' | 'horo' | 'owner' | 'admin'
           created_at?: string
           updated_at?: string | null
           favorites?: string[]

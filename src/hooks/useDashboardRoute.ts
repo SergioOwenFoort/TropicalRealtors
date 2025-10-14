@@ -50,6 +50,9 @@ export function useDashboardRoute(): DashboardRoute {
           case 'owner':
             setPath('/owner');
             break;
+          case 'horo':
+            setPath('/horo');
+            break;
           default:
             setPath('/user'); // Regular user dashboard
             break;

@@ -8,6 +8,7 @@ export function useUserRole() {
   const [isRealtor, setIsRealtor] = useState(false);
   const [isOwner, setIsOwner] = useState(false);
   const [isBusiness, setIsBusiness] = useState(false);
+  const [isHoro, setIsHoro] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -17,6 +18,7 @@ export function useUserRole() {
         setIsRealtor(false);
         setIsOwner(false);
         setIsBusiness(false);
+        setIsHoro(false);
         setIsLoading(false);
         return;
       }
@@ -39,11 +41,13 @@ export function useUserRole() {
               setIsRealtor(false);
               setIsOwner(false);
               setIsBusiness(false);
+              setIsHoro(false);
             } else {
               setIsAdmin(false);
               setIsRealtor(false);
               setIsOwner(false);
               setIsBusiness(false);
+              setIsHoro(false);
             }
           } else {
             throw error;
@@ -54,6 +58,7 @@ export function useUserRole() {
           setIsRealtor(role === 'realtor');
           setIsOwner(role === 'owner');
           setIsBusiness(role === 'business');
+          setIsHoro(role === 'horo');
         }
       } catch (error) {
         console.error('Error fetching user role:', error);
@@ -66,12 +71,14 @@ export function useUserRole() {
           setIsRealtor(false);
           setIsOwner(false);
           setIsBusiness(false);
+          setIsHoro(false);
         } else {
           // Set all roles to false on error to prevent unauthorized access
           setIsAdmin(false);
           setIsRealtor(false);
           setIsOwner(false);
           setIsBusiness(false);
+          setIsHoro(false);
         }
       } finally {
         setIsLoading(false);
@@ -81,5 +88,5 @@ export function useUserRole() {
     getUserRole();
   }, [user]);
 
-  return { isAdmin, isRealtor, isOwner, isBusiness, isLoading };
+  return { isAdmin, isRealtor, isOwner, isBusiness, isHoro, isLoading };
 }

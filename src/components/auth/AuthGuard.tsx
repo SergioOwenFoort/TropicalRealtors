@@ -11,6 +11,7 @@ interface AuthGuardProps {
   requireRealtor?: boolean;
   requireOwner?: boolean;
   requireBusiness?: boolean;
+  requireHoro?: boolean;
 }
 
 export function AuthGuard({ 
@@ -19,10 +20,11 @@ export function AuthGuard({
   requireAdmin = false,
   requireRealtor = false,
   requireOwner = false,
-  requireBusiness = false
+  requireBusiness = false,
+  requireHoro = false
 }: AuthGuardProps) {
   const { user, loading: authLoading } = useAuth();
-  const { isAdmin, isRealtor, isOwner, isBusiness, isLoading: roleLoading } = useUserRole();
+  const { isAdmin, isRealtor, isOwner, isBusiness, isHoro, isLoading: roleLoading } = useUserRole();
   const location = useLocation();
 
   // Show loading spinner while checking auth and role
@@ -47,6 +49,10 @@ export function AuthGuard({
   }
 
   if (requireBusiness && !isBusiness) {
+    return <Navigate to="/" replace />;
+  }
+
+  if (requireHoro && !isHoro) {
     return <Navigate to="/" replace />;
   }
 

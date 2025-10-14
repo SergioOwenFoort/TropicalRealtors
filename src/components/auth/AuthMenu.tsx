@@ -11,7 +11,7 @@ interface AuthMenuProps {
 
 export function AuthMenu({ isOpen, onClose }: AuthMenuProps) {
   const { user } = useAuth();
-  const { isAdmin, isRealtor } = useUserRole();
+  const { isAdmin, isRealtor, isHoro } = useUserRole();
   const { logout } = useSupabaseAuthActions();
   const navigate = useNavigate();
 
@@ -60,7 +60,7 @@ export function AuthMenu({ isOpen, onClose }: AuthMenuProps) {
                 <span>Mijn Profiel</span>
               </Link>
 
-              {!isRealtor && (
+              {!isRealtor && !isHoro && (
                 <Link
                   to="/account"
                   className="flex items-center gap-3 w-full px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
@@ -79,6 +79,17 @@ export function AuthMenu({ isOpen, onClose }: AuthMenuProps) {
                 >
                   <Building2 className="w-5 h-5" />
                   <span>Makelaarsdashboard</span>
+                </Link>
+              )}
+
+              {isHoro && (
+                <Link
+                  to="/horo"
+                  className="flex items-center gap-3 w-full px-4 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+                  onClick={onClose}
+                >
+                  <Building2 className="w-5 h-5" />
+                  <span>HoRe Dashboard</span>
                 </Link>
               )}
 
