@@ -234,18 +234,22 @@ export function MasterIslandProvider({ children }: { children: React.ReactNode }
     
     // Use cache if available and not expired
     if (!forceRefresh && cached && (now - lastFetch) < CACHE_DURATION) {
-            setIslandData(prev => ({
-                ...prev,
-                ...cached,
-                config: ISLAND_CONFIGS[island],
-                locations: [...ISLAND_LOCATIONS[island]],
-                menuItems: {
-                  koop: [...ISLAND_MENUS[island].koop],
-                  huur: [...ISLAND_MENUS[island].huur],
-                  informatie: [...ISLAND_MENUS[island].informatie]
-                },
-                loading: { properties: false, realtors: false, carousel: false, all: false }
-            }));
+      const islandLocations = ISLAND_LOCATIONS[island] || [];
+      const islandMenus = ISLAND_MENUS[island] || { koop: [], huur: [], informatie: [] };
+      const islandConfig = ISLAND_CONFIGS[island] || ISLAND_CONFIGS['bonaire'];
+      
+      setIslandData(prev => ({
+        ...prev,
+        ...cached,
+        config: islandConfig,
+        locations: [...islandLocations],
+        menuItems: {
+          koop: [...(islandMenus.koop || [])],
+          huur: [...(islandMenus.huur || [])],
+          informatie: [...(islandMenus.informatie || [])]
+        },
+        loading: { properties: false, realtors: false, carousel: false, all: false }
+      }));
       return;
     }
 
@@ -373,19 +377,23 @@ export function MasterIslandProvider({ children }: { children: React.ReactNode }
         }
       }
 
-      // Create the complete island data
+      // Create the complete island data with defensive checks
+      const islandLocations = ISLAND_LOCATIONS[island] || [];
+      const islandMenus = ISLAND_MENUS[island] || { koop: [], huur: [], informatie: [] };
+      const islandConfig = ISLAND_CONFIGS[island] || ISLAND_CONFIGS['bonaire']; // fallback to bonaire
+      
       const completeIslandData: IslandData = {
         properties,
         featuredProperties,
         realtors,
         carouselSlides,
-        locations: [...ISLAND_LOCATIONS[island]],
+        locations: [...islandLocations],
         menuItems: {
-          koop: [...ISLAND_MENUS[island].koop],
-          huur: [...ISLAND_MENUS[island].huur],
-          informatie: [...ISLAND_MENUS[island].informatie]
+          koop: [...(islandMenus.koop || [])],
+          huur: [...(islandMenus.huur || [])],
+          informatie: [...(islandMenus.informatie || [])]
         },
-        config: ISLAND_CONFIGS[island],
+        config: islandConfig,
         loading: { properties: false, realtors: false, carousel: false, all: false },
         errors: { properties: propertiesError, realtors: realtorsError, carousel: carouselError }
       };

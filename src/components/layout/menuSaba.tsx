@@ -11,7 +11,7 @@ import { Logo } from '../ui/Logo';
 
 export function MenuSaba() {
   const { user } = useAuth();
-  const { isAdmin, isRealtor } = useUserRole();
+  const { isAdmin, isRealtor, isHoro } = useUserRole();
   const [isAuthMenuOpen, setIsAuthMenuOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isCountryMenuOpen, setIsCountryMenuOpen] = useState(false);
@@ -152,6 +152,12 @@ export function MenuSaba() {
                       <span>Dashboard</span>
                     </Link>
                   )}
+                  {isHoro && (
+                    <Link to="/horo" className="text-gray-600 hover:text-blue-600 flex items-center gap-2">
+                      <Building2 className="w-5 h-5" />
+                      <span>HoRe Dashboard</span>
+                    </Link>
+                  )}
                   {isAdmin && (
                     <Link to="/admin" className="text-gray-600 hover:text-blue-600 flex items-center gap-2">
                       <Settings className="w-5 h-5" />
@@ -283,13 +289,44 @@ export function MenuSaba() {
                 Contact
               </Link>
               {user && (
-                <Link
-                  to="/account"
-                  className="block py-2 text-gray-600"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  Mijn Account
-                </Link>
+                <>
+                  {!isRealtor && !isHoro && (
+                    <Link
+                      to="/account"
+                      className="block py-2 text-gray-600"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      Mijn Account
+                    </Link>
+                  )}
+                  {isRealtor && (
+                    <Link
+                      to="/makelaar"
+                      className="block py-2 text-gray-600"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      Makelaar Dashboard
+                    </Link>
+                  )}
+                  {isHoro && (
+                    <Link
+                      to="/horo"
+                      className="block py-2 text-gray-600"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      HoRe Dashboard
+                    </Link>
+                  )}
+                  {isAdmin && (
+                    <Link
+                      to="/admin"
+                      className="block py-2 text-gray-600"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      Admin Dashboard
+                    </Link>
+                  )}
+                </>
               )}
             </div>
           </div>

@@ -11,7 +11,7 @@ import { Logo } from '../ui/Logo';
 
 export function MenuSintMaarten() {
   const { user } = useAuth();
-  const { isAdmin, isRealtor } = useUserRole();
+  const { isAdmin, isRealtor, isHoro } = useUserRole();
   const [isAuthMenuOpen, setIsAuthMenuOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isCountryMenuOpen, setIsCountryMenuOpen] = useState(false);
@@ -150,6 +150,12 @@ export function MenuSintMaarten() {
                     <Link to="/makelaar" className="text-gray-600 hover:text-blue-600 flex items-center gap-2">
                       <Building2 className="w-5 h-5" />
                       <span>Dashboard</span>
+                    </Link>
+                  )}
+                  {isHoro && (
+                    <Link to="/horo" className="text-gray-600 hover:text-blue-600 flex items-center gap-2">
+                      <Building2 className="w-5 h-5" />
+                      <span>HoRe Dashboard</span>
                     </Link>
                   )}
                   {isAdmin && (
@@ -302,6 +308,16 @@ export function MenuSintMaarten() {
                     >
                       <Building2 className="w-5 h-5" />
                       <span>Dashboard</span>
+                    </Link>
+                  )}
+                  {isHoro && (
+                    <Link
+                      to="/horo"
+                      className="flex items-center gap-2 py-2 text-gray-600"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      <Building2 className="w-5 h-5" />
+                      <span>HoRe Dashboard</span>
                     </Link>
                   )}
                   {isAdmin && (

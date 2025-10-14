@@ -11,7 +11,7 @@ import { Logo } from '../ui/Logo';
 
 export function MenuBonaire() {
   const { user } = useAuth();
-  const { isAdmin: hookIsAdmin, isRealtor } = useUserRole();
+  const { isAdmin: hookIsAdmin, isRealtor, isHoro } = useUserRole();
   const isAdmin = user?.email === 's.admin@bonairemakelaars.com' || hookIsAdmin;
   
   const [isAuthMenuOpen, setIsAuthMenuOpen] = useState(false);
@@ -143,7 +143,7 @@ export function MenuBonaire() {
 
               {user && (
                 <>
-                  {!isRealtor && (
+                  {!isRealtor && !isHoro && (
                     <Link to="/account" className="text-gray-600 hover:text-blue-600 flex items-center gap-2">
                       <LayoutDashboard className="w-5 h-5" />
                       <span>Dashboard</span>
@@ -153,6 +153,12 @@ export function MenuBonaire() {
                     <Link to="/makelaar" className="text-gray-600 hover:text-blue-600 flex items-center gap-2">
                       <Building2 className="w-5 h-5" />
                       <span>Dashboard</span>
+                    </Link>
+                  )}
+                  {isHoro && (
+                    <Link to="/horo" className="text-gray-600 hover:text-blue-600 flex items-center gap-2">
+                      <Building2 className="w-5 h-5" />
+                      <span>HoRe Dashboard</span>
                     </Link>
                   )}
                   {isAdmin && (
@@ -287,7 +293,7 @@ export function MenuBonaire() {
               </Link>
               {user && (
                 <>
-                  {!isRealtor && (
+                  {!isRealtor && !isHoro && (
                     <Link
                       to="/account"
                       className="flex items-center gap-2 py-2 text-gray-600"
@@ -305,6 +311,16 @@ export function MenuBonaire() {
                     >
                       <Building2 className="w-5 h-5" />
                       <span>Dashboard</span>
+                    </Link>
+                  )}
+                  {isHoro && (
+                    <Link
+                      to="/horo"
+                      className="flex items-center gap-2 py-2 text-gray-600"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      <Building2 className="w-5 h-5" />
+                      <span>HoRe Dashboard</span>
                     </Link>
                   )}
                   {isAdmin && (
