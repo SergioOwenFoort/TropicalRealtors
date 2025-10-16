@@ -9,13 +9,14 @@ import { toast } from 'react-hot-toast';
 interface OwnerPropertyTableProps {
   properties: Property[];
   onPropertyDeleted: () => void;
+  onAddListing?: () => void;
 }
 
 interface PropertyWithStats extends Property {
   favorite_count: number;
 }
 
-export function OwnerPropertyTable({ properties, onPropertyDeleted }: OwnerPropertyTableProps) {
+export function OwnerPropertyTable({ properties, onPropertyDeleted, onAddListing }: OwnerPropertyTableProps) {
   const navigate = useNavigate();
   const [propertiesWithStats, setPropertiesWithStats] = useState<PropertyWithStats[]>([]);
   const [loading, setLoading] = useState(true);
@@ -119,15 +120,15 @@ export function OwnerPropertyTable({ properties, onPropertyDeleted }: OwnerPrope
     return (
       <div className="bg-white rounded-lg shadow-sm p-8 text-center">
         <Home className="w-12 h-12 mx-auto mb-4 text-gray-400" />
-        <h3 className="text-lg font-semibold text-gray-900 mb-2">Nog geen woningen toegevoegd</h3>
-        <p className="text-gray-600 mb-6">U kunt tot 3 woningen toevoegen om te verkopen of verhuren</p>
-        <Link
-          to="/owner/woning/nieuw"
+        <h3 className="text-lg font-semibold text-gray-900 mb-2">Nog geen listing toegevoegd</h3>
+        <p className="text-gray-600 mb-6">U kunt tot 3 listings toevoegen om te verhuren</p>
+        <button
+          onClick={onAddListing}
           className="inline-flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
         >
           <Home className="w-5 h-5" />
-          Woning toevoegen
-        </Link>
+          Nieuwe listing toevoegen
+        </button>
       </div>
     );
   }
@@ -135,7 +136,7 @@ export function OwnerPropertyTable({ properties, onPropertyDeleted }: OwnerPrope
   return (
     <div className="bg-white rounded-lg shadow-sm overflow-hidden">
       <div className="p-6 border-b">
-        <h2 className="text-xl font-semibold text-gray-900">Mijn Woningen ({propertiesWithStats.length}/3)</h2>
+        <h2 className="text-xl font-semibold text-gray-900">Mijn Listings ({propertiesWithStats.length}/3)</h2>
         <p className="text-gray-600 text-sm mt-1">Beheer uw woningaanbod</p>
       </div>
 

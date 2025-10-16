@@ -284,7 +284,7 @@ export function CsvUploader() {
                 <li>type - Type (koop/huur) (verplicht)</li>
                 <li>size - Woonoppervlak in m² (numeriek, verplicht)</li>
               </ul>
-              <p className="mt-2 text-xs text-yellow-700">Optionele kolommen: country, postalCode, bedrooms, bathrooms, features, status, makelaarId</p>
+              <p className="mt-2 text-xs text-yellow-700">Optionele kolommen: country, phone_number (of phone), postalCode, bedrooms, bathrooms, features, status, makelaarId</p>
             </div>
           </div>
         </div>

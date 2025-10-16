@@ -14,7 +14,7 @@ import { useProperties } from '../../hooks/useProperties';
 import { useAuth } from '../../hooks/useAuth';
 import { useProfile } from '../../hooks/useProfile';
 import { Property } from '../../types';
-import { ListingUploader } from '../../components/realtor/ListingUploader';
+import { VacationPropertyUploader } from '../../components/horo/VacationPropertyUploader';
 
 export function HoroDashboard() {
   const { properties, refreshProperties } = useProperties();
@@ -117,7 +117,7 @@ export function HoroDashboard() {
                   className="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 rounded-md shadow ml-2"
                 >
                   <Plus className="w-4 h-4" />
-                  Nieuwe woning toevoegen
+                  Nieuwe listing toevoegen
                 </button>
               </div>
             </div>
@@ -183,7 +183,7 @@ export function HoroDashboard() {
           <div className="absolute inset-0 bg-black/50" onClick={() => setShowAddListing(false)} />
           <div className="relative z-10 w-full max-w-5xl max-h-[90vh] overflow-y-auto bg-white rounded-lg shadow-lg">
             <div className="flex items-center justify-between p-4 border-b">
-              <h2 className="text-lg font-semibold">Nieuwe woning toevoegen</h2>
+              <h2 className="text-lg font-semibold">Nieuwe listing toevoegen</h2>
               <button
                 onClick={() => setShowAddListing(false)}
                 className="p-2 rounded hover:bg-gray-100"
@@ -193,7 +193,7 @@ export function HoroDashboard() {
               </button>
             </div>
             <div className="p-4">
-              <ListingUploader
+              <VacationPropertyUploader
                 onClose={() => setShowAddListing(false)}
                 onSuccess={() => {
                   setShowAddListing(false);

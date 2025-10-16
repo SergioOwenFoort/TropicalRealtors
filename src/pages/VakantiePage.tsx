@@ -1,11 +1,12 @@
-import React, { useState, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { SearchBar } from '../components/vakantie/SearchBar';
 import { FilterSidebar } from '../components/vakantie/FilterSidebar';
 import { ResultsGrid } from '../components/vakantie/ResultsGrid';
 import { MapToggle } from '../components/vakantie/MapToggle';
 import { SortDropdown } from '../components/vakantie/SortDropdown';
+import { InteractiveVacationMap } from '../components/vakantie/InteractiveVacationMap';
 import { vacationProperties } from '../data/vacationProperties';
-import { Filter, Map } from 'lucide-react';
+import { Filter } from 'lucide-react';
 
 interface SearchFilters {
   destination: string;
@@ -200,11 +201,10 @@ export function VakantiePage() {
 
             {/* Results Grid */}
             {showMap ? (
-              <div className="bg-white rounded-lg shadow-md p-8 text-center">
-                <Map className="w-16 h-16 mx-auto text-gray-400 mb-4" />
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">Kaartweergave</h3>
-                <p className="text-gray-600">Kaartfunctionaliteit wordt binnenkort toegevoegd.</p>
-              </div>
+              <InteractiveVacationMap 
+                properties={filteredAndSortedProperties}
+                selectedIsland={filters.destination || null}
+              />
             ) : (
               <ResultsGrid properties={filteredAndSortedProperties} />
             )}

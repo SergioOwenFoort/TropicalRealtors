@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Plus, AlertCircle, Heart, Bell, Trash2, User, MessageSquare, ChevronDown, ChevronUp } from 'lucide-react';
+import { Plus, AlertCircle, Heart, Bell, Trash2, User, MessageSquare, ChevronDown, ChevronUp, X } from 'lucide-react';
 import { useProperties } from '../../hooks/useProperties';
 import { useAuth } from '../../hooks/useAuth';
 import { useFavorites } from '../../hooks/useFavorites';
@@ -11,6 +11,7 @@ import { OwnerPropertyTable } from '../../components/owner/OwnerPropertyTable';
 import { CarouselManagement } from '../../components/admin/CarouselManagement';
 import { LoadingSpinner } from '../../components/LoadingSpinner';
 import { ConversationsDashboard } from '../../components/messages/ConversationsDashboard';
+import { VacationPropertyUploader } from '../../components/horo/VacationPropertyUploader';
 import { useEffect, useState } from 'react';
 
 export function OwnerDashboard() {
@@ -20,6 +21,7 @@ export function OwnerDashboard() {
   const { favorites } = useFavorites();
   const { savedSearches, deleteSearch } = useSavedSearches();
   const [isMessagesExpanded, setIsMessagesExpanded] = useState(false);
+  const [showAddListing, setShowAddListing] = useState(false);
   const { 
     properties: favoriteProperties, 
     loading: favoritesLoading, 
@@ -106,22 +108,22 @@ export function OwnerDashboard() {
         <CarouselManagement />
       </div>
 
-      {/* Mijn Woningen Section - Enhanced Table */}
+      {/* Mijn Listings Section - Enhanced Table */}
       <div className="mb-12">
         <div className="flex justify-between items-center mb-6">
           <div>
-            <h1 className="text-3xl font-bold">Mijn Woningen ({userProperties.length}/3)</h1>
+            <h1 className="text-3xl font-bold">Mijn Listings ({userProperties.length}/3)</h1>
             <p className="text-gray-600 mt-1">Beheer uw woningaanbod met uitgebreide statistieken</p>
           </div>
           <div className="flex gap-3">
             {canAddProperty && (
-              <Link
-                to="/owner/woning/nieuw"
+              <button
+                onClick={() => setShowAddListing(true)}
                 className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
               >
                 <Plus className="w-5 h-5" />
-                Woning toevoegen
-              </Link>
+                Nieuwe listing toevoegen
+              </button>
             )}
             {!canAddProperty && userProperties.length >= 3 && (
               <div className="bg-gray-100 text-gray-600 px-4 py-2 rounded-lg flex items-center gap-2">
@@ -135,6 +137,7 @@ export function OwnerDashboard() {
         <OwnerPropertyTable 
           properties={userProperties}
           onPropertyDeleted={handlePropertyDeleted}
+          onAddListing={() => setShowAddListing(true)}
         />
 
         {userProperties.length > 0 && (
@@ -263,6 +266,35 @@ export function OwnerDashboard() {
           </div>
         </div>
       </div>
+
+      {/* Add Listing Modal */}
+      {showAddListing && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/50" onClick={() => setShowAddListing(false)} />
+          <div className="relative z-10 w-full max-w-5xl max-h-[90vh] overflow-y-auto bg-white rounded-lg shadow-lg">
+            <div className="flex items-center justify-between p-4 border-b">
+              <h2 className="text-lg font-semibold">Nieuwe listing toevoegen</h2>
+              <button
+                onClick={() => setShowAddListing(false)}
+                className="p-2 rounded hover:bg-gray-100"
+                aria-label="Sluiten"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="p-4">
+              <VacationPropertyUploader
+                onClose={() => setShowAddListing(false)}
+                onSuccess={() => {
+                  setShowAddListing(false);
+                  // Optionally refresh properties after successful add
+                  try { refreshProperties(); } catch {}
+                }}
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 }

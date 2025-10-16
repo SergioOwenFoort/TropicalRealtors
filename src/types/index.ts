@@ -6,6 +6,7 @@ export interface Property {
   address: string;
   city: string;
   country: string;
+  phone_number?: string;
   postalCode?: string; // Made optional
   latitude?: number;
   longitude?: number;
@@ -15,7 +16,7 @@ export interface Property {
   images: string[];
   description: string;
   type: 'koop' | 'huur';
-  category: 'appartementen' | 'huizen' | 'vakantiewoningen' | 'nieuwbouw' | 'hotel' | 'resort';
+  category: 'appartementen' | 'huizen' | 'nieuwbouw' | 'winkel' | 'kantoor' | 'werkplaats';
   features: string[];
   datePosted: string;
   status: 'actief' | 'concept' | 'verkocht' | 'verhuurd' | 'ingetrokken';
@@ -25,6 +26,41 @@ export interface Property {
   last_viewed_at?: string;
   favorite_count?: number;
   listingId?: string;
+}
+
+export interface VacationProperty {
+  id: string;
+  name: string;
+  price: number;
+  address: string;
+  city: string;
+  country: string;
+  phone_number?: string;
+  latitude?: number;
+  longitude?: number;
+  bedrooms: number;
+  bathrooms: number;
+  max_guests: number;
+  images: string[];
+  description: string;
+  property_type: 'vacation_villa' | 'vacation_apartment' | 'vacation_resort' | 'vacation_hotel' | 'vacation_studio' | 'vacation_penthouse';
+  amenities: string[];
+  features: string[];
+  rating: number;
+  distance_from_center: number;
+  featured: boolean;
+  check_in_time: string;
+  check_out_time: string;
+  minimum_stay: number;
+  maximum_stay: number;
+  cancellation_policy: string;
+  house_rules: string[];
+  instant_booking: boolean;
+  status: 'available' | 'booked' | 'maintenance' | 'inactive';
+  island: string;
+  horo_id: string;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface User {
@@ -83,7 +119,7 @@ export interface ApiResponse {
 
 export interface PropertyFilters {
   type?: 'koop' | 'huur';
-  category?: 'appartementen' | 'huizen' | 'vakantiewoningen' | 'nieuwbouw' | 'hotel' | 'resort';
+  category?: 'appartementen' | 'huizen' | 'nieuwbouw' | 'winkel' | 'kantoor' | 'werkplaats';
   country?: string;
   city?: string;
   minPrice?: number;

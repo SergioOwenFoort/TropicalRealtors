@@ -27,6 +27,7 @@ export function transformPropertyData(row: Record<string, any>): Omit<Property, 
       address: row.address,
       city: row.city,
       country: row.country,
+      phone_number: row.phone_number || row.phone || "",
       postalCode: row.postalcode || row.postalCode || "",
       bedrooms:
         row.bedrooms !== undefined &&

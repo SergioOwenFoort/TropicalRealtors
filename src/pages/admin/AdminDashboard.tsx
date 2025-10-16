@@ -14,6 +14,7 @@ import { useAllProperties, useProperties } from '../../hooks/useProperties';
 import { Property } from '../../types';
 import { UserManagement } from './UserManagement';
 import { CsvUploader } from '../../components/realtor/CsvUploader';
+import { VacationCsvUploader } from '../../components/admin/VacationCsvUploader';
 import { WebhookTest } from '../../components/realtor/WebhookTest';
 import { ContentEditor } from '../../components/admin/ContentEditor';
 import { DatabaseMaintenance } from '../../components/admin/DatabaseMaintenance';
@@ -612,6 +613,7 @@ export function AdminDashboard() {
           {/* ListingUrlInput removed */}
           <WebhookTest />
           <CsvUploader />
+          <VacationCsvUploader />
         </div>
       )}
 

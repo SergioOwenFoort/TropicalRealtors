@@ -26,6 +26,7 @@ interface PropertyFormData {
   address: string;
   city: string;
   country: string;
+  phone_number: string;
   postalCode: string;
   latitude?: number;
   longitude?: number;
@@ -35,7 +36,7 @@ interface PropertyFormData {
   images: string[];
   description: string;
   type: 'koop' | 'huur';
-  category: 'appartementen' | 'huizen' | 'vakantiewoningen' | 'nieuwbouw' | 'hotel' | 'resort';
+  category: 'appartementen' | 'huizen' | 'nieuwbouw' | 'winkel' | 'kantoor' | 'werkplaats';
   features: string[];
   status: 'actief' | 'concept' | 'verkocht' | 'verhuurd' | 'ingetrokken';
   featured: boolean;
@@ -58,6 +59,7 @@ export function ListingUploader({
     address: initialData?.address || '',
     city: initialData?.city || '',
     country: initialData?.country || 'Bonaire',
+    phone_number: initialData?.phone_number || '',
     postalCode: initialData?.postalCode || '',
     latitude: initialData?.latitude || undefined,
     longitude: initialData?.longitude || undefined,
@@ -98,6 +100,7 @@ export function ListingUploader({
             address: existingProperty.address || '',
             city: existingProperty.city || '',
             country: existingProperty.country || 'Bonaire',
+            phone_number: existingProperty.phone_number || '',
             postalCode: existingProperty.postalCode || '',
             latitude: existingProperty.latitude || undefined,
             longitude: existingProperty.longitude || undefined,
@@ -513,6 +516,7 @@ export function ListingUploader({
       address: '',
       city: '',
       country: 'Bonaire',
+      phone_number: '',
       postalCode: '',
       latitude: undefined,
       longitude: undefined,
@@ -717,10 +721,10 @@ export function ListingUploader({
                     >
                       <option value="huizen">Huizen</option>
                       <option value="appartementen">Appartementen</option>
-                      <option value="vakantiewoningen">Vakantiewoningen</option>
                       <option value="nieuwbouw">Nieuwbouw</option>
-                      <option value="hotel">Hotel</option>
-                      <option value="resort">Resort</option>
+                      <option value="winkel">Winkel</option>
+                      <option value="kantoor">Kantoor</option>
+                      <option value="werkplaats">Werkplaats</option>
                     </select>
                   </div>
                 </div>
@@ -798,6 +802,20 @@ export function ListingUploader({
                   {errors.address && (
                     <p className="text-red-600 text-sm mt-1">{errors.address}</p>
                   )}
+                </div>
+
+                {/* Phone Number */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Telefoonnummer
+                  </label>
+                  <input
+                    type="tel"
+                    value={formData.phone_number}
+                    onChange={(e) => setFormData(prev => ({ ...prev, phone_number: e.target.value }))}
+                    className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="+599 123 4567"
+                  />
                 </div>
 
                 {/* City & Country */}
