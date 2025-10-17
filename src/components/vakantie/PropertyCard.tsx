@@ -1,22 +1,7 @@
 import { Star, MapPin, Wifi, Car, Waves, Coffee, Shield, Heart, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-
-export interface VacationProperty {
-  id: string;
-  name: string;
-  location: string;
-  rating: number;
-  reviewCount: number;
-  images: string[];
-  description: string;
-  pricePerNight: number;
-  type: string;
-  amenities: string[];
-  distanceFromCenter: number;
-  freeCancellation: boolean;
-  featured?: boolean;
-}
+import { VacationProperty } from '../../types';
 
 interface PropertyCardProps {
   property: VacationProperty;
@@ -146,7 +131,7 @@ export function PropertyCard({ property }: PropertyCardProps) {
         )}
 
         {/* Free Cancellation Badge */}
-        {property.freeCancellation && (
+        {property.cancellation_policy === 'flexible' && (
           <div className="absolute bottom-3 left-3 bg-green-600 text-white text-xs font-medium px-2 py-1 rounded flex items-center gap-1">
             <Shield className="w-3 h-3" />
             Gratis annulering
@@ -164,8 +149,8 @@ export function PropertyCard({ property }: PropertyCardProps) {
             </h3>
             <div className="flex items-center gap-1 text-gray-600 mb-2">
               <MapPin className="w-4 h-4" />
-              <span className="text-sm">{property.location}</span>
-              <span className="text-sm">• {property.distanceFromCenter} km van centrum</span>
+              <span className="text-sm">{property.city}, {property.island}</span>
+              <span className="text-sm">• {property.distance_from_center} km van centrum</span>
             </div>
           </div>
           
@@ -206,12 +191,12 @@ export function PropertyCard({ property }: PropertyCardProps) {
           <div>
             <div className="flex items-baseline gap-1">
               <span className="text-2xl font-bold text-gray-900">
-                €{property.pricePerNight}
+                €{property.price}
               </span>
               <span className="text-sm text-gray-600">per nacht</span>
             </div>
             <div className="text-xs text-gray-500">
-              {property.reviewCount} beoordelingen
+              {property.rating || 0} sterren
             </div>
           </div>
           

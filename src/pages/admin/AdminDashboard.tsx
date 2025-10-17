@@ -8,7 +8,7 @@ const ALL_ISLANDS = [
   { key: 'sinteustatius', label: 'Sint Eustatius' }
 ];
 import { useNavigate } from 'react-router-dom';
-import { Plus, Star, Edit, Building2, Users, Trash2, FileText, Settings, Database, UserCheck, Image as ImageIcon, BarChart3, Copy, Check } from 'lucide-react';
+import { Plus, Star, Edit, Building2, Users, Trash2, FileText, Settings, Database, UserCheck, Image as ImageIcon, BarChart3, Copy, Check, Palmtree } from 'lucide-react';
 import { PropertyStatusBadge } from '../../components/realtor/PropertyStatusBadge';
 import { useAllProperties, useProperties } from '../../hooks/useProperties';
 import { Property } from '../../types';
@@ -22,9 +22,10 @@ import { RealtorManagement } from '../../components/admin/RealtorManagement';
 import { CarouselManagement } from '../../components/admin/CarouselManagement';
 import { PropertyAnalytics } from '../../components/analytics/PropertyAnalytics';
 import { useUserRole } from '../../hooks/useUserRole';
+import { VacationPropertiesManagement } from '../../components/admin/VacationPropertiesManagement';
 // import { ListingUploader } from '../../components/realtor/ListingUploader';
 
-type Tab = 'properties' | 'analytics' | 'users' | 'realtors' | 'carousel' | 'content' | 'tools' | 'maintenance';
+type Tab = 'properties' | 'vacation' | 'analytics' | 'users' | 'realtors' | 'carousel' | 'content' | 'tools' | 'maintenance';
 
 export function AdminDashboard() {
   console.log('AdminDashboard rendering');
@@ -180,6 +181,17 @@ export function AdminDashboard() {
             >
               <Building2 className="w-4 h-4" />
               Woningen
+            </button>
+            <button
+              onClick={() => setActiveTab('vacation')}
+              className={`${
+                activeTab === 'vacation'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center gap-1`}
+            >
+              <Palmtree className="w-4 h-4" />
+              Vakantie
             </button>
             <button
               onClick={() => setActiveTab('analytics')}
@@ -571,6 +583,8 @@ export function AdminDashboard() {
           </div>
           {/* ListingUploader available via dedicated route or modal */}
         </div>
+      ) : activeTab === 'vacation' ? (
+        <VacationPropertiesManagement />
       ) : activeTab === 'users' ? (
         <UserManagement />
       ) : activeTab === 'analytics' ? (

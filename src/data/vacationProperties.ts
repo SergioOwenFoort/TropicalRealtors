@@ -16,7 +16,12 @@ export const vacationProperties = [
     amenities: ['wifi', 'pool', 'parking', 'restaurant', 'gym', 'ac'],
     distanceFromCenter: 8.5,
     freeCancellation: true,
-    featured: true
+    featured: true,
+    latitude: 12.5385,
+    longitude: -70.0391,
+    city: 'Aruba',
+    country: 'Aruba',
+    address: 'J.E. Irausquin Blvd 252'
   },
   {
     id: '2',
@@ -33,7 +38,12 @@ export const vacationProperties = [
     type: 'villa',
     amenities: ['wifi', 'pool', 'parking', 'ac'],
     distanceFromCenter: 2.3,
-    freeCancellation: true
+    freeCancellation: true,
+    latitude: 12.1508,
+    longitude: -68.2772,
+    city: 'Bonaire',
+    country: 'Bonaire',
+    address: 'Kaya Grandi 45'
   },
   {
     id: '3',
@@ -51,7 +61,12 @@ export const vacationProperties = [
     type: 'hotel',
     amenities: ['wifi', 'breakfast', 'ac', 'restaurant'],
     distanceFromCenter: 0.5,
-    freeCancellation: false
+    freeCancellation: false,
+    latitude: 12.1224,
+    longitude: -68.8824,
+    city: 'Curaçao',
+    country: 'Curaçao',
+    address: 'Piscadera Bay'
   },
   {
     id: '4',
@@ -68,7 +83,12 @@ export const vacationProperties = [
     type: 'apartment',
     amenities: ['wifi', 'parking', 'ac'],
     distanceFromCenter: 12.0,
-    freeCancellation: true
+    freeCancellation: true,
+    latitude: 18.0425,
+    longitude: -63.0908,
+    city: 'Sint Maarten',
+    country: 'Sint Maarten',
+    address: 'Simpson Bay Road 1'
   },
   {
     id: '5',
@@ -86,7 +106,12 @@ export const vacationProperties = [
     type: 'vacation-house',
     amenities: ['wifi', 'restaurant', 'gym'],
     distanceFromCenter: 5.2,
-    freeCancellation: true
+    freeCancellation: true,
+    latitude: 17.6350,
+    longitude: -63.2300,
+    city: 'Saba',
+    country: 'Saba',
+    address: 'The Bottom'
   },
   {
     id: '6',
@@ -104,7 +129,12 @@ export const vacationProperties = [
     amenities: ['wifi', 'pool', 'parking', 'restaurant', 'ac'],
     distanceFromCenter: 7.8,
     freeCancellation: true,
-    featured: true
+    featured: true,
+    latitude: 12.5642,
+    longitude: -70.0403,
+    city: 'Aruba',
+    country: 'Aruba',
+    address: 'J.E. Irausquin Blvd 81'
   },
   {
     id: '7',
@@ -118,9 +148,14 @@ export const vacationProperties = [
     description: 'Karakteristiek historisch pand in het centrum van Oranjestad met authentieke charme en moderne comfort.',
     pricePerNight: 75,
     type: 'hotel',
-    amenities: ['wifi', 'breakfast', 'parking'],
-    distanceFromCenter: 0.3,
-    freeCancellation: false
+    amenities: ['wifi', 'breakfast', 'ac'],
+    distanceFromCenter: 0.2,
+    freeCancellation: false,
+    latitude: 17.4895,
+    longitude: -62.9736,
+    city: 'Sint Eustatius',
+    country: 'Sint Eustatius',
+    address: 'Oranjestad'
   },
   {
     id: '8',

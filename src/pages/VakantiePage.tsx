@@ -5,7 +5,7 @@ import { ResultsGrid } from '../components/vakantie/ResultsGrid';
 import { MapToggle } from '../components/vakantie/MapToggle';
 import { SortDropdown } from '../components/vakantie/SortDropdown';
 import { InteractiveVacationMap } from '../components/vakantie/InteractiveVacationMap';
-import { vacationProperties } from '../data/vacationProperties';
+import { useVacationProperties } from '../hooks/useVacationProperties';
 import { Filter } from 'lucide-react';
 
 interface SearchFilters {
@@ -35,6 +35,7 @@ const sortOptions: SortOption[] = [
 ];
 
 export function VakantiePage() {
+  const { properties: vacationProperties, loading, error } = useVacationProperties();
   const [showFilters, setShowFilters] = useState(false);
   const [showMap, setShowMap] = useState(false);
   const [sortBy, setSortBy] = useState('recommended');
@@ -54,44 +55,50 @@ export function VakantiePage() {
   // Filter and sort properties based on current filters and sort option
   const filteredAndSortedProperties = useMemo(() => {
     let filtered = vacationProperties.filter(property => {
-      // Apply filters
-      if (filters.destination && !property.location.toLowerCase().includes(filters.destination.toLowerCase())) {
+      // Apply filters - using database field names (snake_case)
+      if (filters.destination) {
+        const searchTerm = filters.destination.toLowerCase();
+        const matchesCity = property.city?.toLowerCase().includes(searchTerm);
+        const matchesIsland = property.island?.toLowerCase().includes(searchTerm);
+        const matchesCountry = property.country?.toLowerCase().includes(searchTerm);
+        if (!matchesCity && !matchesIsland && !matchesCountry) {
+          return false;
+        }
+      }
+      if (filters.propertyType && property.property_type !== filters.propertyType) {
         return false;
       }
-      if (filters.propertyType && property.type !== filters.propertyType) {
+      if (property.price < filters.priceRange[0] || property.price > filters.priceRange[1]) {
         return false;
       }
-      if (property.pricePerNight < filters.priceRange[0] || property.pricePerNight > filters.priceRange[1]) {
+      if (filters.starRating > 0 && (property.rating || 0) < filters.starRating) {
         return false;
       }
-      if (filters.starRating > 0 && property.rating < filters.starRating) {
+      if ((property.distance_from_center || 0) > filters.distanceFromCenter) {
         return false;
       }
-      if (property.distanceFromCenter > filters.distanceFromCenter) {
+      if (filters.amenities.length > 0 && !filters.amenities.every(amenity => property.amenities?.includes(amenity))) {
         return false;
       }
-      if (filters.amenities.length > 0 && !filters.amenities.every(amenity => property.amenities.includes(amenity))) {
-        return false;
-      }
-      if (filters.freeCancellation && !property.freeCancellation) {
+      if (filters.freeCancellation && property.cancellation_policy !== 'flexible') {
         return false;
       }
       return true;
     });
 
-    // Apply sorting
+    // Apply sorting - using database field names
     switch (sortBy) {
       case 'price-low':
-        filtered.sort((a, b) => a.pricePerNight - b.pricePerNight);
+        filtered.sort((a, b) => a.price - b.price);
         break;
       case 'price-high':
-        filtered.sort((a, b) => b.pricePerNight - a.pricePerNight);
+        filtered.sort((a, b) => b.price - a.price);
         break;
       case 'rating':
-        filtered.sort((a, b) => b.rating - a.rating);
+        filtered.sort((a, b) => (b.rating || 0) - (a.rating || 0));
         break;
       case 'distance':
-        filtered.sort((a, b) => a.distanceFromCenter - b.distanceFromCenter);
+        filtered.sort((a, b) => (a.distance_from_center || 0) - (b.distance_from_center || 0));
         break;
       default: // recommended
         // Keep original order for recommended
@@ -99,7 +106,7 @@ export function VakantiePage() {
     }
 
     return filtered;
-  }, [filters, sortBy]);
+  }, [vacationProperties, filters, sortBy]);
 
   const handleSearch = (searchData: Partial<SearchFilters>) => {
     setFilters(prev => ({ ...prev, ...searchData }));
@@ -108,6 +115,28 @@ export function VakantiePage() {
   const handleFilterChange = (filterData: Partial<SearchFilters>) => {
     setFilters(prev => ({ ...prev, ...filterData }));
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Vakantiehuizen laden...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-red-600 mb-4">Er is een fout opgetreden bij het laden van de accommodaties.</p>
+          <p className="text-gray-600">{error}</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -202,7 +231,7 @@ export function VakantiePage() {
             {/* Results Grid */}
             {showMap ? (
               <InteractiveVacationMap 
-                properties={filteredAndSortedProperties}
+                properties={vacationProperties}
                 selectedIsland={filters.destination || null}
               />
             ) : (

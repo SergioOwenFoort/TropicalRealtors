@@ -1,6 +1,6 @@
 import { useEffect, useMemo } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
-import { LatLngExpression, Icon } from 'leaflet';
+import { LatLngExpression, Icon, divIcon } from 'leaflet';
 import { VacationProperty } from '../../types';
 import { Link } from 'react-router-dom';
 import 'leaflet/dist/leaflet.css';
@@ -24,16 +24,13 @@ const ISLAND_COORDINATES: Record<string, { center: LatLngExpression; zoom: numbe
 // Area bounds: North: 18.15°N, South: 11.75°N, West: -70.3°W, East: -62.8°W
 const ALL_ISLANDS_VIEW = { center: [14.95, -66.55] as LatLngExpression, zoom: 6 };
 
-// Custom marker icon
+// Custom marker icon using TropicalRealtors logo
 const createCustomIcon = () => {
   return new Icon({
-    iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
-    iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
-    shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-    iconSize: [25, 41],
-    iconAnchor: [12, 41],
-    popupAnchor: [1, -34],
-    shadowSize: [41, 41]
+    iconUrl: '/map-marker.svg',
+    iconSize: [40, 52],
+    iconAnchor: [20, 52],
+    popupAnchor: [0, -52],
   });
 };
 
@@ -49,6 +46,10 @@ function MapViewController({ center, zoom }: { center: LatLngExpression; zoom: n
 }
 
 export function InteractiveVacationMap({ properties, selectedIsland }: InteractiveVacationMapProps) {
+  // Debug logging
+  console.log('🗺️ InteractiveVacationMap - Total properties received:', properties.length);
+  console.log('🗺️ InteractiveVacationMap - Selected island:', selectedIsland);
+  
   // Determine map center and zoom based on selected island
   const { center, zoom } = useMemo(() => {
     if (selectedIsland && ISLAND_COORDINATES[selectedIsland]) {
@@ -59,7 +60,7 @@ export function InteractiveVacationMap({ properties, selectedIsland }: Interacti
 
   // Filter properties that have valid coordinates
   const propertiesWithCoordinates = useMemo(() => {
-    return properties.filter(
+    const filtered = properties.filter(
       property => 
         property.latitude !== undefined && 
         property.latitude !== null &&
@@ -68,6 +69,8 @@ export function InteractiveVacationMap({ properties, selectedIsland }: Interacti
         !isNaN(property.latitude) &&
         !isNaN(property.longitude)
     );
+    console.log('🗺️ Properties with valid coordinates:', filtered.length);
+    return filtered;
   }, [properties]);
 
   const customIcon = useMemo(() => createCustomIcon(), []);
