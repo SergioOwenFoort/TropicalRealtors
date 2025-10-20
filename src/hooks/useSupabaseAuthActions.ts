@@ -8,8 +8,8 @@ import { useServiceRoleAdmin } from './useServiceRoleAdmin';
 import { sendEmail } from '../utils/emailTemplates';
 
 const supabaseService = SupabaseService.getInstance();
-const ADMIN_EMAIL = import.meta.env.VITE_ADMIN_EMAIL;
-const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD;
+// SECURITY: Admin credentials removed from frontend
+// Admin authentication now handled by backend API
 
 export function useSupabaseAuthActions() {
   const [loading, setLoading] = useState(false);
@@ -29,20 +29,14 @@ export function useSupabaseAuthActions() {
   };
 
   // Login as admin using service role approach
+  // DEPRECATED: Use regular login() function with admin credentials
+  // Backend will automatically detect and handle admin users
   const loginAsAdmin = async () => {
     setLoading(true);
     setError(null);
     try {
-      console.log('Logging in as admin using service role approach...');
-      
-      const success = await adminLogin(ADMIN_EMAIL, ADMIN_PASSWORD);
-      
-      if (!success) {
-        throw new Error('Admin login failed with service role approach');
-      }
-      
-      console.log('Admin login successful with service role approach');
-      return { user: { email: ADMIN_EMAIL } };
+      setError('Please use the regular login form with your admin credentials.');
+      return null;
     } catch (err) {
       handleError(err);
       return null;
@@ -57,22 +51,35 @@ export function useSupabaseAuthActions() {
       setLoading(true);
       console.log('Starting login process for:', email);
 
-      // Check if this is the admin user
-      if (email === ADMIN_EMAIL) {
-        console.log('Admin login detected - using service role approach');
-        const success = await adminLogin(email, password);
-        
-        if (!success) {
-          throw new Error('Admin login failed with service role approach');
+      // Try backend admin authentication first (backend will check if user is admin)
+      try {
+        const adminCheckResponse = await fetch('/api/admin/check', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email })
+        });
+
+        if (adminCheckResponse.ok) {
+          const { isAdmin } = await adminCheckResponse.json();
+          
+          if (isAdmin) {
+            console.log('Admin user detected - using service role approach');
+            const success = await adminLogin(email, password);
+            
+            if (!success) {
+              throw new Error('Admin login failed');
+            }
+            
+            console.log('Admin login successful with service role approach');
+            setError(null);
+            return;
+          }
         }
-        
-        console.log('Admin login successful with service role approach');
-        setError(null);
-        return;
+      } catch (adminCheckError) {
+        console.log('Admin check endpoint not available, proceeding with regular auth');
       }
       
-      // For non-admin users, temporarily use service client until anon key is fixed
-      // TODO: Fix the anon key and switch back to supabaseAnon
+      // For regular users, use standard Supabase authentication
       const { data, error: loginError } = await supabase.auth.signInWithPassword({ 
         email, 
         password

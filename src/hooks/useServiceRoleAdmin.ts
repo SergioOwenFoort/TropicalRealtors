@@ -74,12 +74,20 @@ export const useServiceRoleAdmin = () => {
     const { data: { session } } = await supabase.auth.getSession();
     
     if (session) {
-      // If we have a session, check if the user is an admin
-      // Ask server to validate admin role for the current user (optional future improvement)
-      // For now, rely on local admin session if present
-      if (session.user.email === import.meta.env.VITE_ADMIN_EMAIL) {
-        setIsAuthenticated(true);
-        return true;
+      // Check if the user is an admin by querying their profile
+      try {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', session.user.id)
+          .single();
+        
+        if (profile?.role === 'admin') {
+          setIsAuthenticated(true);
+          return true;
+        }
+      } catch (err) {
+        console.log('Error checking admin role:', err);
       }
     }
     
