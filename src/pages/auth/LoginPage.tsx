@@ -4,11 +4,15 @@ import { LogIn, Mail, Lock, AlertCircle, Eye, EyeOff } from 'lucide-react';
 import { useSupabaseAuthActions as useAuthActions } from '../../hooks/useSupabaseAuthActions';
 import { useAuth } from '../../hooks/useAuth';
 import { Logo } from '../../components/ui/Logo';
+import { sanitizeEmail } from '../../utils/inputSanitization';
+import { checkRateLimit, recordSuccess, formatRetryAfter } from '../../utils/rateLimiter';
 
 export function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [rateLimitError, setRateLimitError] = useState<string | null>(null);
+  const [attemptsLeft, setAttemptsLeft] = useState<number | null>(null);
   const { login, loginWithGoogle, error, loading } = useAuthActions();
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -25,8 +29,33 @@ export function LoginPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await login(email, password);
-    // Don't navigate here - the useEffect will handle navigation when user state updates
+    setRateLimitError(null);
+    
+    // Sanitize email input
+    const sanitizedEmail = sanitizeEmail(email);
+    
+    // Check rate limiting
+    const rateLimitCheck = checkRateLimit(sanitizedEmail);
+    
+    if (!rateLimitCheck.allowed) {
+      const timeString = formatRetryAfter(rateLimitCheck.retryAfter || 0);
+      setRateLimitError(`Te veel inlogpogingen. Probeer het opnieuw over ${timeString}.`);
+      return;
+    }
+    
+    // Update attempts left for UI feedback
+    if (rateLimitCheck.attemptsLeft !== undefined) {
+      setAttemptsLeft(rateLimitCheck.attemptsLeft);
+    }
+    
+    // Attempt login with sanitized email
+    await login(sanitizedEmail, password);
+    
+    // If login was successful, record success to reset rate limit
+    // The useEffect will handle navigation when user state updates
+    if (!error) {
+      recordSuccess(sanitizedEmail);
+    }
   };
 
   const handleGoogleLogin = async () => {
@@ -54,10 +83,26 @@ export function LoginPage() {
           Welcome at TropicalRealtors.com
         </p>
 
+        {rateLimitError && (
+          <div className="bg-red-50 text-red-600 p-4 rounded-lg flex items-start gap-3">
+            <AlertCircle className="w-5 h-5 mt-0.5 flex-shrink-0" />
+            <p className="text-sm font-semibold">{rateLimitError}</p>
+          </div>
+        )}
+
         {error && (
           <div className="bg-red-50 text-red-600 p-4 rounded-lg flex items-start gap-3">
             <AlertCircle className="w-5 h-5 mt-0.5 flex-shrink-0" />
             <p className="text-sm">{error}</p>
+          </div>
+        )}
+
+        {attemptsLeft !== null && attemptsLeft <= 2 && attemptsLeft > 0 && !rateLimitError && (
+          <div className="bg-yellow-50 text-yellow-800 p-4 rounded-lg flex items-start gap-3">
+            <AlertCircle className="w-5 h-5 mt-0.5 flex-shrink-0" />
+            <p className="text-sm">
+              Waarschuwing: Nog {attemptsLeft} {attemptsLeft === 1 ? 'poging' : 'pogingen'} over voordat uw account tijdelijk wordt geblokkeerd.
+            </p>
           </div>
         )}
         
@@ -142,13 +187,13 @@ export function LoginPage() {
           <div className="space-y-4">
             <button
               type="submit"
-              disabled={loading}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+              disabled={loading || !!rateLimitError}
+              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <span className="absolute left-0 inset-y-0 flex items-center pl-3">
                 <LogIn className="h-5 w-5 text-blue-500 group-hover:text-blue-400" />
               </span>
-              {loading ? 'Bezig met inloggen...' : 'Inloggen'}
+              {loading ? 'Bezig met inloggen...' : rateLimitError ? 'Tijdelijk geblokkeerd' : 'Inloggen'}
             </button>
 
             <div className="relative">

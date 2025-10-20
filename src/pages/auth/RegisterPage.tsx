@@ -5,9 +5,10 @@ import { UserPlus, Mail, Lock, User, Home, Building2, Key, AlertCircle, Eye, Eye
 import { useSupabaseAuthActions as useAuthActions } from '../../hooks/useSupabaseAuthActions';
 import { toast } from 'react-hot-toast';
 import { UserRole } from '../../types';
-import { SupabaseService } from '../../services/supabaseService';
 import { supabase } from '../../config/supabase.config';
 import { Logo } from '../../components/ui/Logo';
+import { validatePassword, getPasswordStrengthColor, getPasswordStrengthText } from '../../utils/passwordValidation';
+import { sanitizeEmail, sanitizeText, sanitizePhoneNumber, isValidEmail } from '../../utils/inputSanitization';
 
 export function RegisterPage() {
   const [name, setName] = useState('');
@@ -20,6 +21,7 @@ export function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [role, setRole] = useState<UserRole>('user');
+  const [passwordValidation, setPasswordValidation] = useState({ isValid: false, errors: [] as string[], strength: 'weak' as 'weak' | 'medium' | 'strong' });
   const { register, loginWithGoogle, error, loading } = useAuthActions();
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -34,25 +36,56 @@ export function RegisterPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Sanitize inputs
+    const sanitizedEmail = sanitizeEmail(email);
+    const sanitizedName = sanitizeText(name);
+    const sanitizedAddress = sanitizeText(address);
+    const sanitizedPhone = sanitizePhoneNumber(phoneNumber);
+    const sanitizedCountry = sanitizeText(country);
+    
+    // Validate email
+    if (!isValidEmail(sanitizedEmail)) {
+      toast.error('Voer een geldig email adres in');
+      return;
+    }
+    
+    // Validate password strength
+    const validation = validatePassword(password);
+    if (!validation.isValid) {
+      toast.error(validation.errors[0]);
+      return;
+    }
+    
     if (password !== confirmPassword) {
       toast.error('Wachtwoorden komen niet overeen');
       return;
     }
     try {
-      await register(email, password);
+      await register(sanitizedEmail, password);
       const { data: { session }, error } = await supabase.auth.getSession();
       if (error) throw error;
       if (session?.user) {
-        const supabaseService = SupabaseService.getInstance();
-        await supabaseService.updateProfile(session.user.id, { 
-          display_name: name, 
-          email, 
-          role,
-          address,
-          phone_number: phoneNumber,
-          country
-        });
-        toast.success('Account succesvol aangemaakt!');
+        // Update user profile with additional fields
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .update({ 
+            display_name: sanitizedName, 
+            email: sanitizedEmail, 
+            role,
+            address: sanitizedAddress,
+            phone_number: sanitizedPhone,
+            country: sanitizedCountry
+          })
+          .eq('id', session.user.id);
+        
+        if (profileError) {
+          console.error('Profile update error:', profileError);
+          toast.error('Account aangemaakt, maar profiel kon niet worden bijgewerkt');
+        } else {
+          toast.success('Account succesvol aangemaakt!');
+        }
+        
         const from = location.state?.from?.pathname || '/';
         navigate(from);
       }
@@ -225,11 +258,14 @@ export function RegisterPage() {
                   type={showPassword ? "text" : "password"}
                   required
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    setPasswordValidation(validatePassword(e.target.value));
+                  }}
                   className="appearance-none relative block w-full px-3 py-2 pl-10 pr-10 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                  placeholder="Wachtwoord"
+                  placeholder="Wachtwoord (min. 8 tekens, hoofdletter, cijfer, speciaal teken)"
                   disabled={loading}
-                  minLength={6}
+                  minLength={8}
                 />
                 <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
                   <button
@@ -246,6 +282,25 @@ export function RegisterPage() {
                   </button>
                 </div>
               </div>
+              
+              {/* Password Strength Indicator */}
+              {password && (
+                <div className="mt-2">
+                  <div className="flex items-center justify-between text-sm mb-1">
+                    <span className="text-gray-600">Wachtwoord sterkte:</span>
+                    <span className={getPasswordStrengthColor(passwordValidation.strength) + ' font-medium'}>
+                      {getPasswordStrengthText(passwordValidation.strength)}
+                    </span>
+                  </div>
+                  {passwordValidation.errors.length > 0 && (
+                    <ul className="text-xs text-red-600 space-y-1 mt-1">
+                      {passwordValidation.errors.map((error, index) => (
+                        <li key={index}>• {error}</li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              )}
             </div>
 
             <div>
