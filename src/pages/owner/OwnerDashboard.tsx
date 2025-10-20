@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { Plus, AlertCircle, Heart, Bell, Trash2, User, MessageSquare, ChevronDown, ChevronUp, X } from 'lucide-react';
-import { useProperties } from '../../hooks/useProperties';
+import { useRoleBasedProperties } from '../../hooks/useRoleBasedProperties';
 import { useAuth } from '../../hooks/useAuth';
 import { useFavorites } from '../../hooks/useFavorites';
 import { useProfile } from '../../hooks/useProfile';
@@ -16,7 +16,7 @@ import { useEffect, useState } from 'react';
 
 export function OwnerDashboard() {
   const { user } = useAuth();
-  const { properties, loading: propertiesLoading, refreshProperties } = useProperties();
+  const { properties, loading: propertiesLoading, refreshProperties } = useRoleBasedProperties();
   const { profile, loading: profileLoading } = useProfile();
   const { favorites } = useFavorites();
   const { savedSearches, deleteSearch } = useSavedSearches();

@@ -104,13 +104,24 @@ export function PropertyContact({ property, disableSticky = false }: PropertyCon
             <p className="text-gray-600 text-sm mb-4">
               Liever telefonisch contact? Onze makelaars staan voor u klaar.
             </p>
-            <a
-              href="tel:+31201234567"
-              className="w-full bg-green-600 text-white py-3 px-4 rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center gap-2"
-            >
-              <Phone className="w-5 h-5" />
-              <span>Bel makelaar</span>
-            </a>
+            {property.phone_number ? (
+              <a
+                href={`tel:${property.phone_number}`}
+                className="w-full bg-green-600 text-white py-3 px-4 rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center gap-2"
+              >
+                <Phone className="w-5 h-5" />
+                <span>Bel makelaar</span>
+              </a>
+            ) : (
+              <button
+                disabled
+                className="w-full bg-gray-400 text-white py-3 px-4 rounded-lg cursor-not-allowed flex items-center justify-center gap-2"
+                title="Telefoonnummer niet beschikbaar"
+              >
+                <Phone className="w-5 h-5" />
+                <span>Telefoonnummer niet beschikbaar</span>
+              </button>
+            )}
           </div>
         </div>
       </div>
