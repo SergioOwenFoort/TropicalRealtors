@@ -3,6 +3,7 @@ import { getEnabledIslandOptions } from '../../utils/islandVisibility';
 import { Upload, X, Image as ImageIcon, MapPin, Home, Bed, Bath, FileText, Tag, Eye, Map } from 'lucide-react';
 import { Property } from '../../types';
 import { useAuth } from '../../hooks/useAuth';
+import { useProfile } from '../../hooks/useProfile';
 import { useProperties } from '../../hooks/useProperties';
 import { ImageEnhancer } from '../../utils/imageEnhancer';
 import { FeatureSelector } from './FeatureSelector';
@@ -50,6 +51,7 @@ export function ListingUploader({
   listingId 
 }: ListingUploaderProps) {
   const { user } = useAuth();
+  const { profile } = useProfile();
   const { addProperty, updateProperty, properties } = useProperties();
   
   const [formData, setFormData] = useState<PropertyFormData>({
@@ -480,6 +482,7 @@ export function ListingUploader({
         ...formData,
         datePosted: new Date().toISOString(),
         makelaarId: user.id,
+        created_by_role: profile?.role || 'realtor', // Save the user's current role
       };
 
       let result;

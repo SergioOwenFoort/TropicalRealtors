@@ -56,7 +56,8 @@ export function transformPropertyData(row: Record<string, any>): Omit<Property, 
       datePosted: formatDateToISO(new Date()),
       status, // use validated status
       featured: false,
-      listingId: generateListingId()
+      listingId: generateListingId(),
+      created_by_role: row.created_by_role || 'realtor' // Default CSV uploads to realtor role
     };
   } catch (error: any) {
     csvLogger.log('error', `Fout bij transformeren van data: ${error.message}`, row);

@@ -3,21 +3,21 @@ import { Link } from 'react-router-dom';
 import { ListFilter, User, Eye, Home, TrendingUp, BarChart3, Plus, X } from 'lucide-react';
 // CSV/Excel bulk upload removed by request
 // import { CsvUploader } from '../../components/realtor/CsvUploader';
-import { RealtorPropertyTable } from '../../components/realtor/RealtorPropertyTable';
+import { HoroPropertyTable } from '../../components/horo/HoroPropertyTable';
 import { PropertyViewTracker } from '../../services/propertyViewTracker';
 // ...existing code...
 // import { WebhookTest } from '../../components/realtor/WebhookTest';
 import { RealtorProfile } from '../../components/realtor/RealtorProfile';
 import { CarouselManagement } from '../../components/admin/CarouselManagement';
 import { ConversationsDashboard } from '../../components/messages/ConversationsDashboard';
-import { useProperties } from '../../hooks/useProperties';
+import { useRoleBasedProperties } from '../../hooks/useRoleBasedProperties';
 import { useAuth } from '../../hooks/useAuth';
 import { useProfile } from '../../hooks/useProfile';
 import { Property } from '../../types';
 import { VacationPropertyUploader } from '../../components/horo/VacationPropertyUploader';
 
 export function HoroDashboard() {
-  const { properties, refreshProperties } = useProperties();
+  const { properties, refreshProperties } = useRoleBasedProperties();
   const { user } = useAuth();
   const { profile } = useProfile();
   const [statusFilter, setStatusFilter] = useState<Property['status'] | 'all'>('all');
@@ -164,7 +164,7 @@ export function HoroDashboard() {
             </div>
           </div>
 
-          <RealtorPropertyTable 
+          <HoroPropertyTable 
             properties={properties}
             onPropertyDeleted={refreshProperties}
             statusFilter={statusFilter}

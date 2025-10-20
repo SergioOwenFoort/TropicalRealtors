@@ -26,6 +26,7 @@ export interface Property {
   last_viewed_at?: string;
   favorite_count?: number;
   listingId?: string;
+  created_by_role?: 'owner' | 'realtor' | 'horo' | 'admin';
 }
 
 export interface VacationProperty {

@@ -7,7 +7,7 @@ export async function getAllProperties(): Promise<Property[]> {
         id, title, description, price, original_price, address, city, country, postal_code,
         latitude, longitude, square_meters, bedrooms, bathrooms, property_type,
         date_posted, featured, images, created_by, owner_id, listing_id, updated_at,
-        status, category, features
+        status, category, features, phone_number, created_by_role
       `)
       .order('date_posted', { ascending: false })
       .limit(100); // Add pagination limit
@@ -72,22 +72,25 @@ export function mapDbToProperty(dbData: any): Property {
     featured: dbData.featured || false,
     makelaarId: dbData.owner_id, // Map owner_id to makelaarId for property ownership
     listingId: dbData.listing_id, // <-- use listingId
-    datePosted: dbData.date_posted
+    datePosted: dbData.date_posted,
+    phone_number: dbData.phone_number,
+    created_by_role: dbData.created_by_role
   };
 }
 
 export async function addProperty(property: Omit<Property, 'id'>) {
-  // Extract makelaarId and set it as created_by and owner_id
-  const { makelaarId, ...propertyData } = property;
+  // Extract makelaarId and created_by_role and set it as created_by and owner_id
+  const { makelaarId, created_by_role, ...propertyData } = property;
 
   // Use mapPropertyToDb to ensure correct DB field names
   const dbProperty = mapPropertyToDb(propertyData);
   
-  // Set the created_by and owner_id fields from makelaarId
+  // Set the created_by, owner_id, and created_by_role fields
   const finalDbProperty = {
     ...dbProperty,
     created_by: makelaarId || null,
-    owner_id: makelaarId || null
+    owner_id: makelaarId || null,
+    created_by_role: created_by_role || null
   };
 
   const { data, error } = await supabase

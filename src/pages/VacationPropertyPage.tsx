@@ -16,9 +16,9 @@ import {
   Share2,
   Check
 } from 'lucide-react';
-import { vacationProperties } from '../data/vacationProperties';
-import { VacationProperty } from '../components/vakantie/PropertyCard';
+import { VacationProperty } from '../types';
 import { VacationPropertyContact } from '../components/vakantie/VacationPropertyContact';
+import { supabase } from '../config/supabase.config';
 
 
 const amenityIcons: { [key: string]: any } = {
@@ -74,6 +74,7 @@ export function VacationPropertyPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [property, setProperty] = useState<VacationProperty | null>(null);
+  const [loading, setLoading] = useState(true);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [selectedDates, setSelectedDates] = useState({
@@ -85,11 +86,40 @@ export function VacationPropertyPage() {
   const [showAllReviews, setShowAllReviews] = useState(false);
 
   useEffect(() => {
-    if (id) {
-      const foundProperty = vacationProperties.find(p => p.id === id);
-      setProperty(foundProperty || null);
-    }
+    const fetchProperty = async () => {
+      if (!id) return;
+      
+      setLoading(true);
+      try {
+        const { data, error } = await supabase
+          .from('vacation_properties')
+          .select('*')
+          .eq('id', id)
+          .single();
+        
+        if (error) throw error;
+        setProperty(data);
+      } catch (error) {
+        console.error('Error fetching vacation property:', error);
+        setProperty(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProperty();
   }, [id]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Laden...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (!property) {
     return (

@@ -4,48 +4,22 @@ import * as propertyService from '../services/propertyService';
 import { useAuth } from './useAuth';
 import { useProfile } from './useProfile';
 
-export function useAllProperties() {
-  const [properties, setProperties] = useState<Property[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const refreshProperties = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const data = await propertyService.getAllProperties();
-      setProperties(data);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load properties');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    refreshProperties();
-  }, []);
-
-  return {
-    properties,
-    loading,
-    error,
-    refreshProperties,
-  };
-}
-
-// Add this:
-export function useProperties() {
+/**
+ * Hook to fetch properties filtered by the user's current role
+ * This prevents showing properties from previous roles when a user switches roles
+ */
+export function useRoleBasedProperties() {
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [lastFetchTime, setLastFetchTime] = useState<number>(0);
   const { user } = useAuth();
+  const { profile } = useProfile();
 
   const refreshProperties = async (force = false) => {
-    if (!user) return;
+    if (!user || !profile) return;
     
-    // Cache for 60 seconds to prevent rapid successive calls (increased from 30)
+    // Cache for 60 seconds to prevent rapid successive calls
     const now = Date.now();
     if (!force && now - lastFetchTime < 60000 && properties.length > 0) {
       return;
@@ -59,9 +33,46 @@ export function useProperties() {
     setLoading(true);
     setError(null);
     try {
-      // Use the comprehensive function that checks all ownership fields
-      const data = await propertyService.getPropertiesByUser(user.id);
-      setProperties(data);
+      // Get all properties for this user
+      const allUserProperties = await propertyService.getPropertiesByUser(user.id);
+      
+      // Filter based on created_by_role (the role when property was created)
+      let filteredProperties: Property[] = [];
+      
+      switch (profile.role) {
+        case 'horo':
+          // HoRo users: Only show properties created while they had the horo role
+          filteredProperties = allUserProperties.filter(prop => 
+            prop.created_by_role === 'horo'
+          );
+          break;
+          
+        case 'realtor':
+        case 'makelaar':
+          // Realtors: Show properties created while they had the realtor role
+          filteredProperties = allUserProperties.filter(prop =>
+            prop.created_by_role === 'realtor' || prop.created_by_role === 'makelaar'
+          );
+          break;
+          
+        case 'owner':
+          // Owners: Show properties created while they had the owner role (max 3)
+          filteredProperties = allUserProperties
+            .filter(prop => prop.created_by_role === 'owner')
+            .slice(0, 3); // Enforce 3-property limit
+          break;
+          
+        case 'admin':
+          // Admins: Show all properties regardless of created_by_role
+          filteredProperties = allUserProperties;
+          break;
+          
+        default:
+          // Default: show all properties for this user
+          filteredProperties = allUserProperties;
+      }
+      
+      setProperties(filteredProperties);
       setLastFetchTime(now);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load properties');
@@ -99,13 +110,13 @@ export function useProperties() {
   };
 
   useEffect(() => {
-    if (user) {
+    if (user && profile) {
       refreshProperties();
     } else {
-      // Clear properties when no user
+      // Clear properties when no user or profile
       setProperties([]);
     }
-  }, [user?.id]); // Use user.id instead of user object to prevent unnecessary re-renders
+  }, [user?.id, profile?.role]); // Re-fetch when user or role changes
 
   return {
     properties,

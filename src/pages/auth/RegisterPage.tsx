@@ -14,6 +14,9 @@ export function RegisterPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [address, setAddress] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [country, setCountry] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [role, setRole] = useState<UserRole>('user');
@@ -41,7 +44,14 @@ export function RegisterPage() {
       if (error) throw error;
       if (session?.user) {
         const supabaseService = SupabaseService.getInstance();
-        await supabaseService.updateProfile(session.user.id, { display_name: name, email, role });
+        await supabaseService.updateProfile(session.user.id, { 
+          display_name: name, 
+          email, 
+          role,
+          address,
+          phone_number: phoneNumber,
+          country
+        });
         toast.success('Account succesvol aangemaakt!');
         const from = location.state?.from?.pathname || '/';
         navigate(from);
@@ -138,6 +148,66 @@ export function RegisterPage() {
                   onChange={(e) => setEmail(e.target.value)}
                   className="appearance-none relative block w-full px-3 py-2 pl-10 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
                   placeholder="Email"
+                  disabled={loading}
+                />
+              </div>
+            </div>
+
+            <div>
+              <label htmlFor="address" className="sr-only">Adres</label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Home className="h-5 w-5 text-gray-400" />
+                </div>
+                <input
+                  id="address"
+                  name="address"
+                  type="text"
+                  required
+                  value={address}
+                  onChange={(e) => setAddress(e.target.value)}
+                  className="appearance-none relative block w-full px-3 py-2 pl-10 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
+                  placeholder="Adres"
+                  disabled={loading}
+                />
+              </div>
+            </div>
+
+            <div>
+              <label htmlFor="phoneNumber" className="sr-only">Telefoonnummer</label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Building2 className="h-5 w-5 text-gray-400" />
+                </div>
+                <input
+                  id="phoneNumber"
+                  name="phoneNumber"
+                  type="tel"
+                  required
+                  value={phoneNumber}
+                  onChange={(e) => setPhoneNumber(e.target.value)}
+                  className="appearance-none relative block w-full px-3 py-2 pl-10 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
+                  placeholder="Telefoonnummer"
+                  disabled={loading}
+                />
+              </div>
+            </div>
+
+            <div>
+              <label htmlFor="country" className="sr-only">Land</label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Home className="h-5 w-5 text-gray-400" />
+                </div>
+                <input
+                  id="country"
+                  name="country"
+                  type="text"
+                  required
+                  value={country}
+                  onChange={(e) => setCountry(e.target.value)}
+                  className="appearance-none relative block w-full px-3 py-2 pl-10 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
+                  placeholder="Land"
                   disabled={loading}
                 />
               </div>
