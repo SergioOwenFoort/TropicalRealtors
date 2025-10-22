@@ -6,6 +6,7 @@ import { SearchResultsPage } from '../pages/SearchResultsPage';
 import { VakantiePage } from '../pages/VakantiePage';
 import { VacationPropertyPage } from '../pages/VacationPropertyPage';
 import { MakelaarsPage } from '../pages/MakelaarsWrapper';
+import { OverOnsPage } from '../pages/OverOnsPage';
 import { AuthGuard } from '../components/auth/AuthGuard';
 import { DashboardRouter } from '../components/auth/DashboardRouter';
 import { UserDashboard } from '../pages/user/UserDashboard';
@@ -85,6 +86,10 @@ export const router = createBrowserRouter([
           {
             path: 'makelaars',
             element: <MakelaarsPage />,
+          },
+          {
+            path: 'over-ons',
+            element: <OverOnsPage />,
           },
           {
             path: 'account',
