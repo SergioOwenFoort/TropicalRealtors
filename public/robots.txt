@@ -1,0 +1,37 @@
+# Tropical Realtors - Robots.txt
+# https://tropicalrealtors.com/robots.txt
+
+# Allow all crawlers
+User-agent: *
+Allow: /
+
+# Disallow admin and API routes
+Disallow: /admin/
+Disallow: /api/
+Disallow: /*.json$
+
+# Disallow authentication pages from indexing
+Disallow: /login
+Disallow: /register
+Disallow: /wachtwoord-vergeten
+
+# Disallow user profile pages
+Disallow: /profiel
+Disallow: /opgeslagen-zoekopdrachten
+Disallow: /favorieten
+
+# Allow important assets
+Allow: /*.css$
+Allow: /*.js$
+Allow: /*.jpg$
+Allow: /*.jpeg$
+Allow: /*.png$
+Allow: /*.gif$
+Allow: /*.webp$
+Allow: /*.svg$
+
+# Crawl-delay for polite crawling
+Crawl-delay: 1
+
+# Sitemap location
+Sitemap: https://tropicalrealtors.com/sitemap.xml
