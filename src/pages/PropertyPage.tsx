@@ -152,6 +152,8 @@ import { useUserRole } from '../hooks/useUserRole';
 import { getPropertyById } from '../services/propertyService';
 import { PropertyViewTracker } from '../services/propertyViewTracker';
 import { Property } from '../types';
+import { SEO } from '../components/seo/SEO';
+import { generatePropertySchema } from '../utils/schemaMarkup';
 
 export function PropertyPage() {
   const { id } = useParams();
@@ -248,8 +250,19 @@ export function PropertyPage() {
     );
   }
 
+  const propertySchema = generatePropertySchema(property);
+
   return (
     <main className="max-w-7xl mx-auto px-4 py-8">
+      <SEO
+        title={`${property.title} - ${property.city}, ${property.island || property.country}`}
+        description={`${property.description.substring(0, 155)}...`}
+        keywords={`${property.island || property.country} real estate, ${property.type}, ${property.category}, ${property.city} property, Caribbean homes`}
+        url={`https://tropicalrealtors.com/woning/${property.id}`}
+        image={property.images?.[0] || 'https://tropicalrealtors.com/og-image.jpg'}
+        type="product"
+        schemaMarkup={propertySchema}
+      />
       <div className="mb-6">
         <BackButton />
       </div>
