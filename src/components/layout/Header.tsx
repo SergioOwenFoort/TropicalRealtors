@@ -68,7 +68,6 @@ export function Header() {
                   <div className="absolute top-full left-0 bg-white rounded-lg shadow-md py-2 min-w-[150px] z-10">
                     <Link to="/over-ons" className="block px-4 py-2 text-gray-700 hover:bg-gray-100 whitespace-nowrap" onClick={closeAllMenus}>Over ons</Link>
                     <Link to="/faq" className="block px-4 py-2 text-gray-700 hover:bg-gray-100 whitespace-nowrap" onClick={closeAllMenus}>FAQ</Link>
-                    <Link to="/prijzen" className="block px-4 py-2 text-gray-700 hover:bg-gray-100 whitespace-nowrap" onClick={closeAllMenus}>Prijzen</Link>
                     <Link to="/contact" className="block px-4 py-2 text-gray-700 hover:bg-gray-100 whitespace-nowrap" onClick={closeAllMenus}>Contact</Link>
                   </div>
                 )}
@@ -177,13 +176,6 @@ export function Header() {
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 FAQ
-              </Link>
-              <Link
-                to="/prijzen"
-                className="block py-2 text-gray-600"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                Prijzen
               </Link>
               <Link
                 to="/contact"
