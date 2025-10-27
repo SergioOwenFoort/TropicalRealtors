@@ -40,6 +40,7 @@ async function generateSitemap() {
     { loc: '/woningen', priority: 0.9, changefreq: 'daily' as const },
     { loc: '/vakantie', priority: 0.9, changefreq: 'daily' as const },
     { loc: '/info-aruba', priority: 0.8, changefreq: 'monthly' as const },
+    { loc: '/info-bonaire', priority: 0.8, changefreq: 'monthly' as const },
     { loc: '/over-ons', priority: 0.8, changefreq: 'monthly' as const },
     { loc: '/contact', priority: 0.8, changefreq: 'monthly' as const },
     { loc: '/eilanden', priority: 0.8, changefreq: 'weekly' as const },

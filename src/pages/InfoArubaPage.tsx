@@ -1,5 +1,5 @@
 import { SEO } from '../components/seo/SEO';
-import { Logo } from '../components/common/Logo';
+import { Logo } from '../components/ui/Logo';
 
 export default function InfoArubaPage() {
   return (
@@ -32,7 +32,15 @@ export default function InfoArubaPage() {
                 Droomt u van een nieuw begin op 'One Happy Island'? Een verhuizing naar Aruba is een avontuur vol zon, zee en een relaxte levensstijl. Een goede voorbereiding is echter cruciaal voor een zorgeloze emigratie. De benodigde vergunningen verschillen sterk, afhankelijk van uw nationaliteit. Deze gids biedt een helder overzicht van de essentiële vergunningen voor zowel Nederlanders als niet-Nederlanders die naar Aruba willen verhuizen.
               </p>
               <p className="text-gray-700 leading-relaxed mb-6">
-                Of u nu komt om te werken, te rentenieren of uw droomhuis te bouwen, het navigeren door de lokale regelgeving is de eerste stap. De belangrijkste instantie voor uw verblijf is de Directie Toelating en Integratie Vreemdelingen (DIMAS).
+                Of u nu komt om te werken, te rentenieren of uw droomhuis te bouwen, het navigeren door de lokale regelgeving is de eerste stap. De belangrijkste instantie voor uw verblijf is de{' '}
+                <a 
+                  href="https://www.dimasaruba.aw/" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-blue-600 hover:text-blue-800 underline"
+                >
+                  Directie Toelating en Integratie Vreemdelingen (DIMAS)
+                </a>.
               </p>
 
               <h2 className="text-2xl md:text-3xl font-semibold text-gray-800 mt-12 mb-4">
@@ -67,14 +75,30 @@ export default function InfoArubaPage() {
                 Bouwplannen? De Bouwvergunning is Essentieel
               </h2>
               <p className="text-gray-700 leading-relaxed mb-6">
-                Wilt u een kavel kopen en uw eigen huis bouwen, of een bestaand pand renoveren? Dan heeft u een bouwvergunning nodig van de Dienst Openbare Werken (DOW). U dient hiervoor gedetailleerde bouwtekeningen, constructieberekeningen en een situatietekening in. Het is sterk aan te raden een lokale architect of aannemer in te schakelen die bekend is met de Arubaanse bouwvoorschriften en de aanvraagprocedure.
+                Wilt u een kavel kopen en uw eigen huis bouwen, of een bestaand pand renoveren? Dan heeft u een bouwvergunning nodig van de{' '}
+                <a 
+                  href="https://www.dow.aw/" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-blue-600 hover:text-blue-800 underline"
+                >
+                  Dienst Openbare Werken (DOW)
+                </a>. U dient hiervoor gedetailleerde bouwtekeningen, constructieberekeningen en een situatietekening in. Het is sterk aan te raden een lokale architect of aannemer in te schakelen die bekend is met de Arubaanse bouwvoorschriften en de aanvraagprocedure.
               </p>
 
               <h2 className="text-2xl md:text-3xl font-semibold text-gray-800 mt-10 mb-4">
                 Uw Inboedel Invoeren: Vrijstelling van Invoerrechten
               </h2>
               <p className="text-gray-700 leading-relaxed mb-6">
-                Om uw persoonlijke verhuisgoederen (verhuisboedel) zonder importbelasting in te voeren, moet u een vrijstellingsvergunning aanvragen bij het Departamento di Aduana (Douane van Aruba). U moet kunnen aantonen dat de goederen voor uw persoonlijke gebruik zijn en dat u ze al minstens zes maanden in bezit had voor uw verhuizing. Een gespecialiseerd internationaal verhuisbedrijf kan u helpen met de benodigde documentatie en de douaneafhandeling, wat het proces aanzienlijk vereenvoudigt.
+                Om uw persoonlijke verhuisgoederen (verhuisboedel) zonder importbelasting in te voeren, moet u een vrijstellingsvergunning aanvragen bij het{' '}
+                <a 
+                  href="https://www.douane.aw/" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-blue-600 hover:text-blue-800 underline"
+                >
+                  Departamento di Aduana (Douane van Aruba)
+                </a>. U moet kunnen aantonen dat de goederen voor uw persoonlijke gebruik zijn en dat u ze al minstens zes maanden in bezit had voor uw verhuizing. Een gespecialiseerd internationaal verhuisbedrijf kan u helpen met de benodigde documentatie en de douaneafhandeling, wat het proces aanzienlijk vereenvoudigt.
               </p>
 
               <div className="mt-12 p-6 bg-blue-50 rounded-lg border-l-4 border-blue-500">

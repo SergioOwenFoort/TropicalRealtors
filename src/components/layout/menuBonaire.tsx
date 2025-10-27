@@ -133,6 +133,7 @@ export function MenuBonaire() {
                     onMouseEnter={handleInfoMenuEnter}
                     onMouseLeave={handleInfoMenuLeave}
                   >
+                    <Link to="/info-bonaire" className="block px-4 py-2 text-gray-700 hover:bg-gray-100 whitespace-nowrap" onClick={closeAllMenus}>Info Bonaire</Link>
                     <Link to="/over-ons" className="block px-4 py-2 text-gray-700 hover:bg-gray-100 whitespace-nowrap" onClick={closeAllMenus}>Over ons</Link>
                     <Link to="/faq" className="block px-4 py-2 text-gray-700 hover:bg-gray-100 whitespace-nowrap" onClick={closeAllMenus}>FAQ</Link>
                     <Link to="/contact" className="block px-4 py-2 text-gray-700 hover:bg-gray-100 whitespace-nowrap" onClick={closeAllMenus}>Contact</Link>
@@ -261,6 +262,13 @@ export function MenuBonaire() {
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 Makelaars
+              </Link>
+              <Link
+                to="/info-bonaire"
+                className="block py-2 text-gray-600"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Info Bonaire
               </Link>
               <Link
                 to="/over-ons"
