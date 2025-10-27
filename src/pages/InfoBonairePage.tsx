@@ -48,7 +48,7 @@ export default function InfoBonairePage() {
               <p className="text-gray-700 leading-relaxed mb-6">
                 Personen met de Nederlandse of Amerikaanse nationaliteit hebben een gunstigere positie. Zij hoeven geen standaard verblijfsvergunning aan te vragen, maar dienen een 'Verklaring van Rechtswege' aan te vragen bij de{' '}
                 <a 
-                  href="https://ind.nl/nl/caribisch-nederland" 
+                  href="https://www.rijksdienstcn.com/immigratie-naturalisatie" 
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="text-blue-600 hover:text-blue-800 underline"
@@ -89,7 +89,7 @@ export default function InfoBonairePage() {
               <p className="text-gray-700 leading-relaxed mb-6">
                 Bij een verhuizing hoort natuurlijk uw inboedel. Om uw persoonlijke verhuisgoederen belastingvrij te kunnen invoeren op Bonaire, heeft u een speciale vrijstellingsvergunning nodig van de Douane, onderdeel van de{' '}
                 <a 
-                  href="https://www.belastingdienstcn.nl/" 
+                  href="https://www.belastingdienst-cn.nl/" 
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="text-blue-600 hover:text-blue-800 underline"
