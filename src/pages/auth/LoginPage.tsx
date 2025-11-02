@@ -6,6 +6,9 @@ import { useAuth } from '../../hooks/useAuth';
 import { Logo } from '../../components/ui/Logo';
 import { sanitizeEmail } from '../../utils/inputSanitization';
 import { checkRateLimit, recordSuccess, formatRetryAfter } from '../../utils/rateLimiter';
+import { HCaptchaComponent } from '../../components/security/HCaptcha';
+import { requireCaptcha } from '../../utils/captchaVerification';
+import { toast } from 'react-hot-toast';
 
 export function LoginPage() {
   const [email, setEmail] = useState('');
@@ -13,6 +16,8 @@ export function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [rateLimitError, setRateLimitError] = useState<string | null>(null);
   const [attemptsLeft, setAttemptsLeft] = useState<number | null>(null);
+  const [captchaToken, setCaptchaToken] = useState('');
+  const [showCaptcha, setShowCaptcha] = useState(false);
   const { login, loginWithGoogle, error, loading } = useAuthActions();
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -40,12 +45,33 @@ export function LoginPage() {
     if (!rateLimitCheck.allowed) {
       const timeString = formatRetryAfter(rateLimitCheck.retryAfter || 0);
       setRateLimitError(`Te veel inlogpogingen. Probeer het opnieuw over ${timeString}.`);
+      setShowCaptcha(true); // Show CAPTCHA after rate limit is hit
       return;
     }
     
     // Update attempts left for UI feedback
     if (rateLimitCheck.attemptsLeft !== undefined) {
       setAttemptsLeft(rateLimitCheck.attemptsLeft);
+      
+      // Show CAPTCHA after 2 failed attempts (when 3 attempts left)
+      if (rateLimitCheck.attemptsLeft <= 3) {
+        setShowCaptcha(true);
+      }
+    }
+
+    // Verify CAPTCHA if it's shown
+    if (showCaptcha) {
+      if (!captchaToken) {
+        toast.error('Voltooi alstublieft de CAPTCHA verificatie');
+        return;
+      }
+
+      const captchaValid = await requireCaptcha(captchaToken);
+      if (!captchaValid) {
+        toast.error('CAPTCHA verificatie mislukt. Probeer het opnieuw.');
+        setCaptchaToken(''); // Reset captcha
+        return;
+      }
     }
     
     // Attempt login with sanitized email
@@ -55,6 +81,8 @@ export function LoginPage() {
     // The useEffect will handle navigation when user state updates
     if (!error) {
       recordSuccess(sanitizedEmail);
+      setShowCaptcha(false); // Hide CAPTCHA on successful login
+      setCaptchaToken('');
     }
   };
 
@@ -184,10 +212,22 @@ export function LoginPage() {
             </div>
           </div>
 
+          {/* Show hCaptcha after multiple failed attempts */}
+          {showCaptcha && (
+            <HCaptchaComponent
+              onVerify={(token) => setCaptchaToken(token)}
+              onExpire={() => setCaptchaToken('')}
+              onError={(error) => {
+                console.error('hCaptcha error:', error);
+                toast.error('CAPTCHA fout. Probeer het opnieuw.');
+              }}
+            />
+          )}
+
           <div className="space-y-4">
             <button
               type="submit"
-              disabled={loading || !!rateLimitError}
+              disabled={loading || !!rateLimitError || (showCaptcha && !captchaToken)}
               className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <span className="absolute left-0 inset-y-0 flex items-center pl-3">

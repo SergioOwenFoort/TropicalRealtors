@@ -4,6 +4,8 @@ import { Property } from '../../types';
 import { useAuth } from '../../hooks/useAuth';
 import { toast } from 'react-hot-toast';
 import { MessageService } from '../../services/messageService';
+import { HCaptchaComponent } from '../security/HCaptcha';
+import { requireCaptcha } from '../../utils/captchaVerification';
 
 interface PropertyContactProps {
   property: Property;
@@ -18,6 +20,7 @@ export function PropertyContact({ property, disableSticky = false }: PropertyCon
   const { user } = useAuth();
   const [showMessageForm, setShowMessageForm] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState('');
   const messageModalRef = useRef<HTMLDivElement>(null);
   const [messageData, setMessageData] = useState<MessageFormData>({
     message: ''
@@ -55,6 +58,19 @@ export function PropertyContact({ property, disableSticky = false }: PropertyCon
 
     if (!property.makelaarId) {
       toast.error('Eigenaar informatie niet beschikbaar');
+      return;
+    }
+
+    // Verify CAPTCHA
+    if (!captchaToken) {
+      toast.error('Voltooi alstublieft de CAPTCHA verificatie');
+      return;
+    }
+
+    const captchaValid = await requireCaptcha(captchaToken);
+    if (!captchaValid) {
+      toast.error('CAPTCHA verificatie mislukt. Probeer het opnieuw.');
+      setCaptchaToken('');
       return;
     }
 
@@ -169,9 +185,20 @@ export function PropertyContact({ property, disableSticky = false }: PropertyCon
                   />
                 </div>
 
+                {/* hCaptcha Verification */}
+                <HCaptchaComponent
+                  onVerify={(token) => setCaptchaToken(token)}
+                  onExpire={() => setCaptchaToken('')}
+                  onError={(error) => {
+                    console.error('hCaptcha error:', error);
+                    toast.error('CAPTCHA fout. Probeer het opnieuw.');
+                  }}
+                  size="compact"
+                />
+
                 <button
                   type="submit"
-                  disabled={submitting || !messageData.message.trim()}
+                  disabled={submitting || !messageData.message.trim() || !captchaToken}
                   className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {submitting ? 'Versturen...' : 'Verstuur bericht'}

@@ -19,6 +19,7 @@
     "seo:check": "echo SEO infrastructure ready. Run npm run generate:sitemap to create sitemap."
   },
   "dependencies": {
+    "@hcaptcha/react-hcaptcha": "^1.14.0",
     "@supabase/supabase-js": "^2.55.0",
     "@types/xlsx": "^0.0.35",
     "dotenv": "^17.2.1",

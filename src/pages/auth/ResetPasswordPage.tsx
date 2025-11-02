@@ -3,10 +3,14 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useSupabaseAuthActions } from '../../hooks/useSupabaseAuthActions';
 import { AlertCircle } from 'lucide-react';
 import { supabase } from '../../config/supabase.config';
+import { HCaptchaComponent } from '../../components/security/HCaptcha';
+import { requireCaptcha } from '../../utils/captchaVerification';
+import { toast } from 'react-hot-toast';
 
 export function ResetPasswordPage() {
   const [email, setEmail] = useState('');
   const [connectionStatus, setConnectionStatus] = useState<string>('');
+  const [captchaToken, setCaptchaToken] = useState('');
   const { resetPassword, loading, error, resetSent } = useSupabaseAuthActions();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -25,6 +29,20 @@ export function ResetPasswordPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Verify captcha before sending reset email
+    if (!captchaToken) {
+      toast.error('Voltooi alstublieft de CAPTCHA verificatie');
+      return;
+    }
+
+    const captchaValid = await requireCaptcha(captchaToken);
+    if (!captchaValid) {
+      toast.error('CAPTCHA verificatie mislukt. Probeer het opnieuw.');
+      setCaptchaToken('');
+      return;
+    }
+
     await resetPassword(email);
   };
 
@@ -137,10 +155,17 @@ export function ResetPasswordPage() {
             </div>
           )}
 
+          <div className="flex justify-center">
+            <HCaptchaComponent
+              onVerify={(token) => setCaptchaToken(token)}
+              onExpire={() => setCaptchaToken('')}
+            />
+          </div>
+
           <div>
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || !captchaToken}
               className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
             >
               {loading ? 'Bezig met verzenden...' : 'Reset instructies versturen'}

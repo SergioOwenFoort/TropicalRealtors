@@ -5,6 +5,7 @@ import { toast } from 'react-hot-toast';
 import { SupabaseService } from '../../services/supabaseService';
 import { useUserRole } from '../../hooks/useUserRole';
 import { useNavigate } from 'react-router-dom';
+import { DeleteAccountButton } from '../../components/auth/DeleteAccountButton';
 
 const supabaseService = SupabaseService.getInstance();
 
@@ -209,6 +210,28 @@ export function ProfilePage() {
               </button>
             </div>
           </form>
+        </div>
+
+        {/* Account Verwijderen */}
+        <div className="bg-white rounded-lg shadow-sm border-2 border-red-200">
+          <div className="p-6 border-b bg-red-50">
+            <h2 className="text-xl font-semibold text-red-800">Gevaarlijke Zone</h2>
+          </div>
+          <div className="p-6">
+            <div className="flex items-start justify-between">
+              <div className="flex-1">
+                <h3 className="font-semibold text-gray-900 mb-1">
+                  Account permanent verwijderen
+                </h3>
+                <p className="text-sm text-gray-600">
+                  Verwijder uw account en alle bijbehorende gegevens. Deze actie kan niet ongedaan worden gemaakt.
+                </p>
+              </div>
+              <div className="ml-4">
+                <DeleteAccountButton />
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </main>

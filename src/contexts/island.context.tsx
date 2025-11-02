@@ -1,5 +1,4 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import { detectUserIsland } from '../utils/locationDetection';
 
 type Island = 'bonaire' | 'aruba' | 'curacao' | 'saba';
 
@@ -13,61 +12,26 @@ interface IslandContextType {
 const IslandContext = createContext<IslandContextType | undefined>(undefined);
 
 export const IslandProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [isDetecting, setIsDetecting] = useState(false);
-  const [isAutoDetected, setIsAutoDetected] = useState(false);
+  const [isDetecting] = useState(false);
+  const [isAutoDetected] = useState(false);
   
-  // Initialize island selection with auto-detection
+  // Initialize island selection from localStorage or default to bonaire
   const [selectedIsland, setSelectedIsland] = useState<Island>(() => {
     const savedIsland = localStorage.getItem('selectedIsland');
-    const wasAutoDetected = localStorage.getItem('islandAutoDetected') === 'true';
     
-    // If user manually set an island, use that
-    if (savedIsland && !wasAutoDetected) {
+    // If user set an island, use that
+    if (savedIsland && ['bonaire', 'aruba', 'curacao', 'saba'].includes(savedIsland)) {
       return savedIsland as Island;
     }
     
-    // Otherwise, we'll auto-detect (default to bonaire for now)
+    // Otherwise, default to bonaire
     return 'bonaire';
   });
 
-  // Auto-detect user location on first load
-  useEffect(() => {
-    const shouldAutoDetect = () => {
-      const savedIsland = localStorage.getItem('selectedIsland');
-      const wasAutoDetected = localStorage.getItem('islandAutoDetected') === 'true';
-      const hasManualSelection = savedIsland && !wasAutoDetected;
-      
-      // Only auto-detect if user hasn't manually selected an island
-      return !hasManualSelection;
-    };
-
-    if (shouldAutoDetect()) {
-      setIsDetecting(true);
-      
-      detectUserIsland()
-        .then((detectedIsland) => {
-          setSelectedIsland(detectedIsland);
-          setIsAutoDetected(true);
-          localStorage.setItem('selectedIsland', detectedIsland);
-          localStorage.setItem('islandAutoDetected', 'true');
-          console.log(`Auto-detected island: ${detectedIsland}`);
-        })
-        .catch((error) => {
-          console.warn('Auto-detection failed, using default:', error);
-          setIsAutoDetected(false);
-        })
-        .finally(() => {
-          setIsDetecting(false);
-        });
-    }
-  }, []);
-
-  // Custom setter that marks as manual selection
+  // Custom setter that saves to localStorage
   const handleSetSelectedIsland = (island: Island) => {
     setSelectedIsland(island);
-    setIsAutoDetected(false);
     localStorage.setItem('selectedIsland', island);
-    localStorage.setItem('islandAutoDetected', 'false');
   };
 
   // Save to localStorage whenever the selected island changes

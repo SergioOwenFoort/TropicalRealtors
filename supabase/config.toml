@@ -146,10 +146,13 @@ token_verifications = 30
 web3 = 30
 
 # Configure one of the supported captcha providers: `hcaptcha`, `turnstile`.
+# NOTE: hCaptcha is now implemented at the application level (client-side + server-side verification)
+# This Supabase-level captcha is optional but can provide additional protection.
+# Uncomment and configure if you want Supabase to also validate captcha tokens.
 # [auth.captcha]
 # enabled = true
 # provider = "hcaptcha"
-# secret = ""
+# secret = "env(VITE_HCAPTCHA_SECRET_KEY)"
 
 [auth.email]
 # Allow/disallow new user signups via email to your project.

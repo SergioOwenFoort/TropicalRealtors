@@ -1,9 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Phone, Mail, X } from 'lucide-react';
-import { VacationProperty } from './PropertyCard';
+import { VacationProperty } from '../../types';
 import { useAuth } from '../../hooks/useAuth';
 import { toast } from 'react-hot-toast';
 import { MessageService } from '../../services/messageService';
+import { HCaptchaComponent } from '../security/HCaptcha';
+import { requireCaptcha } from '../../utils/captchaVerification';
 
 interface VacationPropertyContactProps {
   property: VacationProperty;
@@ -22,6 +24,7 @@ export function VacationPropertyContact({ property, disableSticky = false }: Vac
   const [messageData, setMessageData] = useState<MessageFormData>({
     message: ''
   });
+  const [captchaToken, setCaptchaToken] = useState('');
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -53,6 +56,19 @@ export function VacationPropertyContact({ property, disableSticky = false }: Vac
       return;
     }
 
+    // Verify captcha before sending
+    if (!captchaToken) {
+      toast.error('Voltooi alstublieft de CAPTCHA verificatie');
+      return;
+    }
+
+    const captchaValid = await requireCaptcha(captchaToken);
+    if (!captchaValid) {
+      toast.error('CAPTCHA verificatie mislukt. Probeer het opnieuw.');
+      setCaptchaToken('');
+      return;
+    }
+
     // For vacation properties, we'll use a default contact ID since they don't have makelaarId
     const contactId = 'vacation-contact-default';
 
@@ -71,6 +87,7 @@ export function VacationPropertyContact({ property, disableSticky = false }: Vac
         toast.success('Bericht verzonden! De eigenaar ontvangt uw bericht en neemt contact met u op.');
         setShowMessageForm(false);
         setMessageData({ message: '' });
+        setCaptchaToken('');
       } else {
         toast.error(result.error || 'Er is een fout opgetreden bij het versturen van uw bericht');
       }
@@ -167,9 +184,17 @@ export function VacationPropertyContact({ property, disableSticky = false }: Vac
                   />
                 </div>
 
+                <div className="flex justify-center">
+                  <HCaptchaComponent
+                    onVerify={(token) => setCaptchaToken(token)}
+                    onExpire={() => setCaptchaToken('')}
+                    size="compact"
+                  />
+                </div>
+
                 <button
                   type="submit"
-                  disabled={submitting || !messageData.message.trim()}
+                  disabled={submitting || !messageData.message.trim() || !captchaToken}
                   className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {submitting ? 'Versturen...' : 'Verstuur bericht'}

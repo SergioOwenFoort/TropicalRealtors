@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { AlertCircle, CheckCircle, Key } from 'lucide-react';
+import { HCaptchaComponent } from '../../components/security/HCaptcha';
+import { requireCaptcha } from '../../utils/captchaVerification';
 
 export function ForgotPasswordResetPage() {
   const [newPassword, setNewPassword] = useState('');
@@ -8,6 +10,7 @@ export function ForgotPasswordResetPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState('');
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
@@ -41,6 +44,19 @@ export function ForgotPasswordResetPage() {
 
     if (newPassword.length < 6) {
       setError('Wachtwoord moet minstens 6 karakters lang zijn');
+      return;
+    }
+
+    // Verify captcha before proceeding
+    if (!captchaToken) {
+      setError('Voltooi alstublieft de CAPTCHA verificatie');
+      return;
+    }
+
+    const captchaValid = await requireCaptcha(captchaToken);
+    if (!captchaValid) {
+      setError('CAPTCHA verificatie mislukt. Probeer het opnieuw.');
+      setCaptchaToken('');
       return;
     }
 
@@ -178,10 +194,17 @@ export function ForgotPasswordResetPage() {
             </div>
           )}
 
+          <div className="flex justify-center">
+            <HCaptchaComponent
+              onVerify={(token) => setCaptchaToken(token)}
+              onExpire={() => setCaptchaToken('')}
+            />
+          </div>
+
           <div>
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || !captchaToken}
               className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
             >
               {loading 

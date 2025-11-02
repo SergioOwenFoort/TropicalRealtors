@@ -9,6 +9,8 @@ import { supabase } from '../../config/supabase.config';
 import { Logo } from '../../components/ui/Logo';
 import { validatePassword, getPasswordStrengthColor, getPasswordStrengthText } from '../../utils/passwordValidation';
 import { sanitizeEmail, sanitizeText, sanitizePhoneNumber, isValidEmail } from '../../utils/inputSanitization';
+import { HCaptchaComponent } from '../../components/security/HCaptcha';
+import { requireCaptcha } from '../../utils/captchaVerification';
 
 export function RegisterPage() {
   const [name, setName] = useState('');
@@ -22,6 +24,7 @@ export function RegisterPage() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [role, setRole] = useState<UserRole>('user');
   const [passwordValidation, setPasswordValidation] = useState({ isValid: false, errors: [] as string[], strength: 'weak' as 'weak' | 'medium' | 'strong' });
+  const [captchaToken, setCaptchaToken] = useState('');
   const { register, loginWithGoogle, error, loading } = useAuthActions();
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -36,6 +39,20 @@ export function RegisterPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Verify CAPTCHA first
+    if (!captchaToken) {
+      toast.error('Voltooi alstublieft de CAPTCHA verificatie');
+      return;
+    }
+
+    // Verify captcha token on server side
+    const captchaValid = await requireCaptcha(captchaToken);
+    if (!captchaValid) {
+      toast.error('CAPTCHA verificatie mislukt. Probeer het opnieuw.');
+      setCaptchaToken(''); // Reset captcha
+      return;
+    }
     
     // Sanitize inputs
     const sanitizedEmail = sanitizeEmail(email);
@@ -361,10 +378,20 @@ export function RegisterPage() {
             </div>
           </div>
 
+          {/* hCaptcha Verification */}
+          <HCaptchaComponent
+            onVerify={(token) => setCaptchaToken(token)}
+            onExpire={() => setCaptchaToken('')}
+            onError={(error) => {
+              console.error('hCaptcha error:', error);
+              toast.error('CAPTCHA fout. Probeer het opnieuw.');
+            }}
+          />
+
           <div className="space-y-4">
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || !captchaToken}
               className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
             >
               <span className="absolute left-0 inset-y-0 flex items-center pl-3">

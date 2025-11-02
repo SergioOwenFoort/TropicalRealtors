@@ -3,7 +3,6 @@ import { supabase } from '../config/supabase.config';
 import { Property } from '../types';
 import { CarouselSlide } from '../types';
 import { mapDbToProperty } from '../services/propertyService';
-import { detectUserIsland } from '../utils/locationDetection';
 
 // Define the island type
 type Island = 'aruba' | 'bonaire' | 'curacao' | 'saba' | 'sint-eustatius' | 'sint-maarten';
@@ -200,17 +199,16 @@ const getIslandCountryName = (island: string): string => {
 };
 
 export function MasterIslandProvider({ children }: { children: React.ReactNode }) {
-  // Initialize island selection with user preference and location detection
+  // Initialize island selection with user preference or default to bonaire
   const [selectedIsland, setSelectedIsland] = useState<Island>(() => {
     const savedIsland = localStorage.getItem('selectedIsland');
-    const wasAutoDetected = localStorage.getItem('islandAutoDetected') === 'true';
     
-    // If user manually set an island, use that
-    if (savedIsland && !wasAutoDetected && ['aruba', 'bonaire', 'curacao', 'saba', 'sint-eustatius', 'sint-maarten'].includes(savedIsland)) {
+    // If user set an island, use that
+    if (savedIsland && ['aruba', 'bonaire', 'curacao', 'saba', 'sint-eustatius', 'sint-maarten'].includes(savedIsland)) {
       return savedIsland as Island;
     }
     
-    // Otherwise, default to bonaire (will be auto-detected in useEffect)
+    // Otherwise, default to bonaire
     return 'bonaire';
   });
 
@@ -424,44 +422,18 @@ export function MasterIslandProvider({ children }: { children: React.ReactNode }
     }
   }, []);
 
-  // Auto-detect user location on first load
+  // Load saved island or default to bonaire on first load
   useEffect(() => {
-    const shouldAutoDetect = () => {
-      const savedIsland = localStorage.getItem('selectedIsland');
-      const wasAutoDetected = localStorage.getItem('islandAutoDetected') === 'true';
-      const hasManualSelection = savedIsland && !wasAutoDetected;
-      
-      // Only auto-detect if user hasn't manually selected an island
-      return !hasManualSelection;
-    };
-
-    if (shouldAutoDetect()) {
-      detectUserIsland()
-        .then((detectedIsland) => {
-          // All islands are now supported
-          setSelectedIsland(detectedIsland);
-          localStorage.setItem('selectedIsland', detectedIsland);
-          localStorage.setItem('islandAutoDetected', 'true');
-          console.log(`Auto-detected island: ${detectedIsland}`);
-          fetchIslandData(detectedIsland);
-        })
-        .catch((error) => {
-          console.warn('Auto-detection failed, using default:', error);
-          fetchIslandData(selectedIsland);
-        });
-    } else {
-      // User has manual selection, just load the data
-      fetchIslandData(selectedIsland);
-    }
+    // Just load the data for the selected island (already initialized from localStorage or default)
+    fetchIslandData(selectedIsland);
   }, []);
 
   // Switch to a different island
   const switchIsland = useCallback((island: Island) => {
     if (island !== selectedIsland) {
       setSelectedIsland(island);
-      // Mark as manual selection
+      // Save the user's selection
       localStorage.setItem('selectedIsland', island);
-      localStorage.setItem('islandAutoDetected', 'false');
       fetchIslandData(island);
     }
   }, [selectedIsland, fetchIslandData]);
