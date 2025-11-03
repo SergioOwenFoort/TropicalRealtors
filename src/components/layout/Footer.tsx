@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Mail, MapPin, Phone } from 'lucide-react';
 import { Logo } from '../ui/Logo';
+import { GoogleTranslate } from '../ui/GoogleTranslate';
 
 export function Footer() {
   const currentYear = new Date().getFullYear();
@@ -12,7 +13,7 @@ export function Footer() {
           {/* Company Info */}
           <div>
             <div className="mb-4">
-              <Logo className="h-12" variant="white" />
+              <Logo className="h-12" />
             </div>
             <p className="text-gray-300 text-sm leading-relaxed mb-4">
               Uw vertrouwde partner voor vastgoed op Aruba, Bonaire, Curaçao, Saba, Sint-Eustatius en Sint-Maarten.
@@ -110,9 +111,12 @@ export function Footer() {
         {/* Bottom Bar */}
         <div className="border-t border-gray-700 pt-6 mt-6">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-gray-400 text-sm text-center md:text-left">
-              © {currentYear} Tropical Realtors. Alle rechten voorbehouden.
-            </p>
+            <div className="flex flex-col md:flex-row items-center gap-4">
+              <p className="text-gray-400 text-sm text-center md:text-left">
+                © {currentYear} Tropical Realtors. Alle rechten voorbehouden.
+              </p>
+              <GoogleTranslate />
+            </div>
             <div className="flex gap-6">
               <Link 
                 to="/privacyverklaring" 
