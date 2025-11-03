@@ -5,6 +5,7 @@ import { MenuCuracao } from './menuCuracao';
 import { MenuSaba } from './menuSaba';
 import { MenuSintMaarten } from './menuSintMaarten';
 import { MenuSintEustatius } from './menuSintEustatius';
+import { Footer } from './Footer';
 import { Toaster } from 'react-hot-toast';
 import { PropertyProvider } from '../../contexts/PropertyContext';
 import { useIsland } from '../../contexts/MasterIslandContext';
@@ -35,14 +36,17 @@ export function Layout() {
   
   return (
     <PropertyProvider>
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gray-50 flex flex-col">
         {renderMenu()}
         <HeroCarousel />
         {/* SearchBar below the carousel, visible on every page */}
         <div className="py-6 flex justify-center bg-white border-b border-gray-100">
           <SearchBar />
         </div>
-        <Outlet />
+        <div className="flex-grow">
+          <Outlet />
+        </div>
+        <Footer />
         <Toaster position="top-right" />
       </div>
     </PropertyProvider>
