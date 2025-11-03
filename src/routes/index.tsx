@@ -7,6 +7,7 @@ import { VakantiePage } from '../pages/VakantiePage';
 import { VacationPropertyPage } from '../pages/VacationPropertyPage';
 import { MakelaarsPage } from '../pages/MakelaarsWrapper';
 import { OverOnsPage } from '../pages/OverOnsPage';
+import { ContactPage } from '../pages/ContactPage';
 import InfoArubaPage from '../pages/InfoArubaPage';
 import InfoBonairePage from '../pages/InfoBonairePage';
 import { AuthGuard } from '../components/auth/AuthGuard';
@@ -92,6 +93,10 @@ export const router = createBrowserRouter([
           {
             path: 'over-ons',
             element: <OverOnsPage />,
+          },
+          {
+            path: 'contact',
+            element: <ContactPage />,
           },
           {
             path: 'info-aruba',

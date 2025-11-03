@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { UserProperties } from '../../components/admin/UserProperties';
-import { Users, Building2, Mail, Calendar, Trash2, Edit2, Shield, AlertTriangle, Search } from 'lucide-react';
+import { UserChatViewer } from '../../components/admin/UserChatViewer';
+import { Users, Building2, Mail, Calendar, Trash2, Edit2, Shield, AlertTriangle, Search, MessageSquare } from 'lucide-react';
 import { SupabaseService } from '../../services/supabaseService';
 import { UserRole } from '../../types';
 import { toast } from 'react-hot-toast';
@@ -149,6 +150,7 @@ export function UserManagement() {
   const [roleFilter, setRoleFilter] = useState<UserRole | 'all'>('all');
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [deletingUser, setDeletingUser] = useState<User | null>(null);
+  const [viewingChatUser, setViewingChatUser] = useState<User | null>(null);
 
   const supabaseService = SupabaseService.getInstance();
 
@@ -326,6 +328,13 @@ export function UserManagement() {
 
               <div className="flex items-center gap-2">
                 <button
+                  onClick={() => setViewingChatUser(user)}
+                  className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                  title="Bekijk chatgesprekken"
+                >
+                  <MessageSquare className="w-4 h-4" />
+                </button>
+                <button
                   onClick={() => setEditingUser(user)}
                   className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                   title="Rol bewerken"
@@ -383,6 +392,56 @@ export function UserManagement() {
           onClose={() => setDeletingUser(null)}
           onConfirm={handleDeleteUser}
         />
+      )}
+
+      {viewingChatUser && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg w-full max-w-5xl max-h-[90vh] flex flex-col">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between p-6 border-b bg-gradient-to-r from-blue-50 to-cyan-50">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-blue-100 text-blue-600 rounded-lg">
+                  <MessageSquare className="w-6 h-6" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-semibold text-gray-900">
+                    Chatgesprekken
+                  </h3>
+                  <p className="text-sm text-gray-600 mt-1">
+                    {viewingChatUser.display_name || 'Onbekende naam'} ({viewingChatUser.email})
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setViewingChatUser(null)}
+                className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Modal Content */}
+            <div className="flex-1 overflow-y-auto p-6">
+              <UserChatViewer
+                userId={viewingChatUser.id}
+                userName={viewingChatUser.display_name || viewingChatUser.email}
+                userEmail={viewingChatUser.email}
+              />
+            </div>
+
+            {/* Modal Footer */}
+            <div className="p-4 border-t bg-gray-50 flex justify-end">
+              <button
+                onClick={() => setViewingChatUser(null)}
+                className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
+              >
+                Sluiten
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

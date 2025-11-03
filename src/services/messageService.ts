@@ -59,6 +59,30 @@ export class MessageService {
         return { success: false, error: error.message };
       }
 
+      // Send email notification to recipient (fire and forget)
+      try {
+        await fetch('/.netlify/functions/send-message-notification', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            recipient_email: messageData.recipient_email,
+            recipient_name: messageData.recipient_name,
+            sender_name: messageData.sender_name,
+            property_title: messageData.property_title,
+            subject: messageData.subject,
+            message: messageData.message,
+            viewing_date: messageData.viewing_date,
+            viewing_time: messageData.viewing_time,
+            viewing_notes: messageData.viewing_notes,
+          }),
+        });
+      } catch (emailError) {
+        // Don't fail the message sending if email fails
+        console.error('Failed to send email notification:', emailError);
+      }
+
       return { success: true, message: result };
     } catch (error) {
       console.error('Error in sendMessage:', error);
