@@ -86,17 +86,18 @@ export function GoogleTranslate() {
         .goog-te-gadget-simple {
           background: #f3f4f6 !important;
           border: 1px solid #d1d5db !important;
-          border-radius: 8px !important;
-          padding: 10px 18px !important;
-          font-size: 14px !important;
+          border-radius: 4px !important;
+          padding: 4px 10px !important;
+          font-size: 12px !important;
           font-weight: 600 !important;
           display: inline-flex !important;
           align-items: center !important;
-          gap: 8px !important;
+          gap: 4px !important;
           cursor: pointer !important;
           transition: all 0.3s ease !important;
           font-family: inherit !important;
           position: relative !important;
+          min-height: 28px !important;
         }
         
         .goog-te-gadget-simple:hover {
@@ -123,17 +124,15 @@ export function GoogleTranslate() {
         /* Add globe icon and custom text */
         .goog-te-gadget-simple .goog-te-menu-value span:last-child:before {
           content: '🌍 Taal';
-          font-size: 14px;
-          margin-right: 6px;
+          font-size: 12px !important;
+          margin-right: 4px;
+          display: inline !important;
         }
         
         /* Hide the actual language text to show only our custom label */
         .goog-te-gadget-simple .goog-te-menu-value span:last-child {
           font-size: 0 !important;
-        }
-        
-        .goog-te-gadget-simple .goog-te-menu-value span:last-child:before {
-          font-size: 14px !important;
+          display: inline-block !important;
         }
         
         /* Hide the default icon */
@@ -177,13 +176,14 @@ export function GoogleTranslate() {
         /* Mobile responsive */
         @media (max-width: 640px) {
           .goog-te-gadget-simple {
-            font-size: 13px !important;
-            padding: 8px 14px !important;
+            font-size: 11px !important;
+            padding: 4px 8px !important;
+            min-height: 26px !important;
           }
           
           .goog-te-gadget-simple .goog-te-menu-value span:last-child:before {
-            font-size: 16px;
-            margin-right: 4px;
+            font-size: 11px;
+            margin-right: 3px;
           }
         }
       `}</style>

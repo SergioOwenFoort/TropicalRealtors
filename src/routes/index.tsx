@@ -15,6 +15,8 @@ import InfoCuracaoPage from '../pages/InfoCuracaoPage';
 import InfoSabaPage from '../pages/InfoSabaPage';
 import InfoSintEustatiusPage from '../pages/InfoSintEustatiusPage';
 import InfoSintMaartenPage from '../pages/InfoSintMaartenPage';
+import { DisclaimerPage } from '../pages/DisclaimerPage';
+import { PrivacyverklaringPage } from '../pages/PrivacyverklaringPage';
 import { AuthGuard } from '../components/auth/AuthGuard';
 import { DashboardRouter } from '../components/auth/DashboardRouter';
 import { UserDashboard } from '../pages/user/UserDashboard';
@@ -130,6 +132,14 @@ export const router = createBrowserRouter([
           {
             path: 'info-sint-maarten',
             element: <InfoSintMaartenPage />,
+          },
+          {
+            path: 'disclaimer',
+            element: <DisclaimerPage />,
+          },
+          {
+            path: 'privacyverklaring',
+            element: <PrivacyverklaringPage />,
           },
           {
             path: 'account',
