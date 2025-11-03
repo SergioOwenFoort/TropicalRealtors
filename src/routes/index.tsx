@@ -8,8 +8,13 @@ import { VacationPropertyPage } from '../pages/VacationPropertyPage';
 import { MakelaarsPage } from '../pages/MakelaarsWrapper';
 import { OverOnsPage } from '../pages/OverOnsPage';
 import { ContactPage } from '../pages/ContactPage';
+import { FAQPage } from '../pages/FAQPage';
 import InfoArubaPage from '../pages/InfoArubaPage';
 import InfoBonairePage from '../pages/InfoBonairePage';
+import InfoCuracaoPage from '../pages/InfoCuracaoPage';
+import InfoSabaPage from '../pages/InfoSabaPage';
+import InfoSintEustatiusPage from '../pages/InfoSintEustatiusPage';
+import InfoSintMaartenPage from '../pages/InfoSintMaartenPage';
 import { AuthGuard } from '../components/auth/AuthGuard';
 import { DashboardRouter } from '../components/auth/DashboardRouter';
 import { UserDashboard } from '../pages/user/UserDashboard';
@@ -99,12 +104,32 @@ export const router = createBrowserRouter([
             element: <ContactPage />,
           },
           {
+            path: 'faq',
+            element: <FAQPage />,
+          },
+          {
             path: 'info-aruba',
             element: <InfoArubaPage />,
           },
           {
             path: 'info-bonaire',
             element: <InfoBonairePage />,
+          },
+          {
+            path: 'info-curacao',
+            element: <InfoCuracaoPage />,
+          },
+          {
+            path: 'info-saba',
+            element: <InfoSabaPage />,
+          },
+          {
+            path: 'info-sint-eustatius',
+            element: <InfoSintEustatiusPage />,
+          },
+          {
+            path: 'info-sint-maarten',
+            element: <InfoSintMaartenPage />,
           },
           {
             path: 'account',

@@ -130,6 +130,7 @@ export function MenuSintEustatius() {
                     onMouseEnter={handleInfoMenuEnter}
                     onMouseLeave={handleInfoMenuLeave}
                   >
+                    <Link to="/info-sint-eustatius" className="block px-4 py-2 text-gray-700 hover:bg-gray-100 whitespace-nowrap" onClick={closeAllMenus}>Info Sint-Eustatius</Link>
                     <Link to="/over-ons" className="block px-4 py-2 text-gray-700 hover:bg-gray-100 whitespace-nowrap" onClick={closeAllMenus}>Over ons</Link>
                     <Link to="/faq" className="block px-4 py-2 text-gray-700 hover:bg-gray-100 whitespace-nowrap" onClick={closeAllMenus}>FAQ</Link>
                     <Link to="/contact" className="block px-4 py-2 text-gray-700 hover:bg-gray-100 whitespace-nowrap" onClick={closeAllMenus}>Contact</Link>
@@ -258,6 +259,13 @@ export function MenuSintEustatius() {
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 Makelaars
+              </Link>
+              <Link
+                to="/info-sint-eustatius"
+                className="block py-2 text-gray-600"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Info Sint-Eustatius
               </Link>
               <Link
                 to="/over-ons"
