@@ -69,8 +69,14 @@ export function VacationPropertyContact({ property, disableSticky = false }: Vac
       return;
     }
 
-    // For vacation properties, we'll use a default contact ID since they don't have makelaarId
-    const contactId = 'vacation-contact-default';
+    // For vacation properties, use the horo_id (owner) if available, otherwise skip
+    const contactId = property.horo_id;
+    
+    if (!contactId) {
+      toast.error('Geen contactpersoon beschikbaar voor deze woning');
+      setSubmitting(false);
+      return;
+    }
 
     setSubmitting(true);
 

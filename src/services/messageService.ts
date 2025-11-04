@@ -62,10 +62,18 @@ export class MessageService {
         const senderName = profile?.display_name || 'Onbekend';
         const propertyTitle = property?.title || 'Eigendom';
         
+        // Check if sender is admin - if so, don't send self-emails
+        const isAdmin = user.email?.includes('admin@') || user.email?.includes('s.admin@');
+        
         console.log('📧 Attempting to send email notification to:', recipientEmail);
         
         if (!recipientEmail) {
-          console.warn('⚠️ No recipient email found, skipping email notification');
+          if (!isAdmin) {
+            console.warn('⚠️ No recipient email found, skipping email notification');
+          }
+          // Skip silently if admin
+        } else if (recipientEmail === user.email) {
+          console.log('⏭️ Skipping email - sender and recipient are the same');
         } else {
           const emailResponse = await fetch('/.netlify/functions/send-message-notification', {
             method: 'POST',
@@ -190,10 +198,18 @@ export class MessageService {
         const senderName = senderProfile?.display_name || 'Onbekend';
         const propertyTitle = property?.title || 'Eigendom';
         
+        // Check if sender is admin - if so, don't send self-emails
+        const isAdmin = user.email?.includes('admin@') || user.email?.includes('s.admin@');
+        
         console.log('📧 Attempting to send email notification for reply to:', recipientEmail);
         
         if (!recipientEmail) {
-          console.warn('⚠️ No recipient email found, skipping email notification');
+          if (!isAdmin) {
+            console.warn('⚠️ No recipient email found, skipping email notification');
+          }
+          // Skip silently if admin
+        } else if (recipientEmail === user.email) {
+          console.log('⏭️ Skipping email - sender and recipient are the same');
         } else {
           const emailResponse = await fetch('/.netlify/functions/send-message-notification', {
             method: 'POST',

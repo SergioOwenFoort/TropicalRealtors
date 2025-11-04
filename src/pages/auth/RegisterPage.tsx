@@ -37,21 +37,24 @@ export function RegisterPage() {
     }
   }, [user, navigate, location.state?.from?.pathname]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Verify CAPTCHA first
-    if (!captchaToken) {
-      toast.error('Voltooi alstublieft de CAPTCHA verificatie');
-      return;
-    }
+    // Verify CAPTCHA first (only if configured)
+    const captchaConfigured = import.meta.env.VITE_HCAPTCHA_SITE_KEY;
+    if (captchaConfigured) {
+      if (!captchaToken) {
+        toast.error('Voltooi alstublieft de CAPTCHA verificatie');
+        return;
+      }
 
-    // Verify captcha token on server side
-    const captchaValid = await requireCaptcha(captchaToken);
-    if (!captchaValid) {
-      toast.error('CAPTCHA verificatie mislukt. Probeer het opnieuw.');
-      setCaptchaToken(''); // Reset captcha
-      return;
+      // Verify captcha token on server side
+      const captchaValid = await requireCaptcha(captchaToken);
+      if (!captchaValid) {
+        toast.error('CAPTCHA verificatie mislukt. Probeer het opnieuw.');
+        setCaptchaToken(''); // Reset captcha
+        return;
+      }
     }
     
     // Sanitize inputs
