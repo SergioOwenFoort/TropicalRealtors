@@ -128,19 +128,43 @@ export class MessageService {
       }
 
       // Determine sender and recipient for the reply
+      const recipientId = originalMessage.sender_id === user.id 
+        ? originalMessage.recipient_id 
+        : originalMessage.sender_id;
+      
       const replyData = {
         property_id: originalMessage.property_id,
         sender_id: user.id,
-        recipient_id: originalMessage.sender_id === user.id 
-          ? originalMessage.recipient_id 
-          : originalMessage.sender_id,
+        recipient_id: recipientId,
         subject: originalMessage.subject.startsWith('Re: ') 
           ? originalMessage.subject 
           : `Re: ${originalMessage.subject}`,
         message: replyMessage,
         message_type: originalMessage.message_type,
-        contact_info: null,
       };
+
+      // Get property information for email
+      const { data: property } = await supabase
+        .from('properties')
+        .select('title')
+        .eq('id', originalMessage.property_id)
+        .single();
+
+      // Get sender profile
+      const { data: senderProfile } = await supabase
+        .from('profiles')
+        .select('display_name, email')
+        .eq('id', user.id)
+        .single();
+
+      // Get recipient profile
+      const { data: recipientProfile } = await supabase
+        .from('profiles')
+        .select('display_name, email')
+        .eq('id', recipientId)
+        .single();
+
+      console.log('Attempting to insert reply with data:', replyData);
 
       const { data: result, error } = await supabase
         .from('messages')
@@ -150,12 +174,56 @@ export class MessageService {
 
       if (error) {
         console.error('Error sending reply:', error);
+        console.error('Error details:', error.details, error.hint, error.code);
         return { success: false, error: error.message };
       }
 
       // Mark original message as read if the current user is the recipient
       if (originalMessage.recipient_id === user.id && originalMessage.status === 'unread') {
         await this.markAsRead(originalMessageId);
+      }
+
+      // Send email notification to recipient (fire and forget)
+      try {
+        const recipientEmail = recipientProfile?.email || '';
+        const recipientName = recipientProfile?.display_name || 'Onbekend';
+        const senderName = senderProfile?.display_name || 'Onbekend';
+        const propertyTitle = property?.title || 'Eigendom';
+        
+        console.log('📧 Attempting to send email notification for reply to:', recipientEmail);
+        
+        if (!recipientEmail) {
+          console.warn('⚠️ No recipient email found, skipping email notification');
+        } else {
+          const emailResponse = await fetch('/.netlify/functions/send-message-notification', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              recipient_email: recipientEmail,
+              recipient_name: recipientName,
+              sender_name: senderName,
+              property_title: propertyTitle,
+              subject: replyData.subject,
+              message: replyData.message,
+              viewing_date: null,
+              viewing_time: null,
+              viewing_notes: null,
+            }),
+          });
+
+          const emailResult = await emailResponse.json();
+          
+          if (!emailResponse.ok) {
+            console.error('❌ Email notification failed:', emailResult);
+          } else {
+            console.log('✅ Email notification sent successfully:', emailResult);
+          }
+        }
+      } catch (emailError) {
+        // Don't fail the reply if email fails
+        console.error('❌ Failed to send email notification:', emailError);
       }
 
       return { success: true, message: result };
