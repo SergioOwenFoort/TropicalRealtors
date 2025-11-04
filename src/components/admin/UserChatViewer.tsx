@@ -84,14 +84,35 @@ export function UserChatViewer({ userId, userName, userEmail }: UserChatViewerPr
 
       console.log('✅ Loaded messages for user:', userId, 'Count:', messages?.length || 0);
 
+      // Fetch all unique user IDs from messages
+      const userIds = new Set<string>();
+      messages?.forEach((msg: Message) => {
+        userIds.add(msg.sender_id);
+        userIds.add(msg.recipient_id);
+      });
+
+      // Fetch profiles for all users involved in conversations
+      const { data: profiles } = await supabase
+        .from('profiles')
+        .select('id, display_name, email')
+        .in('id', Array.from(userIds));
+
+      console.log('✅ Fetched profiles:', profiles?.length || 0);
+
+      // Create profile lookup map
+      const profileMap = new Map(
+        profiles?.map(p => [p.id, { display_name: p.display_name || 'Onbekend', email: p.email }]) || []
+      );
+
       // Group messages by conversation (other user)
       const conversationMap = new Map<string, Conversation>();
 
       messages?.forEach((msg: Message) => {
         const isUserSender = msg.sender_id === userId;
         const otherUserId = isUserSender ? msg.recipient_id : msg.sender_id;
-        const otherUserName = isUserSender ? msg.recipient_name : msg.sender_name;
-        const otherUserEmail = isUserSender ? msg.recipient_email : msg.sender_email;
+        const otherUserProfile = profileMap.get(otherUserId);
+        const otherUserName = otherUserProfile?.display_name || 'Onbekend';
+        const otherUserEmail = otherUserProfile?.email || 'Onbekend';
 
         if (!conversationMap.has(otherUserId)) {
           conversationMap.set(otherUserId, {
