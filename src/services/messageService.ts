@@ -48,6 +48,8 @@ export class MessageService {
         viewing_notes: data.viewing_notes || null,
       };
 
+      console.log('Attempting to insert message with data:', messageData);
+      
       const { data: result, error } = await supabase
         .from('messages')
         .insert(messageData)
@@ -56,6 +58,7 @@ export class MessageService {
 
       if (error) {
         console.error('Error sending message:', error);
+        console.error('Error details:', error.details, error.hint, error.code);
         return { success: false, error: error.message };
       }
 
