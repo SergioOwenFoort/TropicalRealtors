@@ -31,15 +31,11 @@ export class MessageService {
         .eq('id', data.recipient_id)
         .single();
 
+      // Data to insert into messages table (only fields that exist in the table)
       const messageData = {
         property_id: data.property_id,
-        property_title: property?.title || 'Eigendom',
         sender_id: user.id,
         recipient_id: data.recipient_id,
-        sender_name: profile?.display_name || 'Onbekend',
-        sender_email: profile?.email || user.email || '',
-        recipient_name: recipientProfile?.display_name || 'Onbekend',
-        recipient_email: recipientProfile?.email || '',
         subject: data.subject || `Vraag over: ${property?.title || 'Eigendom'}`,
         message: data.message,
         message_type: data.message_type || 'inquiry',
@@ -64,9 +60,14 @@ export class MessageService {
 
       // Send email notification to recipient (fire and forget)
       try {
-        console.log('📧 Attempting to send email notification to:', messageData.recipient_email);
+        const recipientEmail = recipientProfile?.email || '';
+        const recipientName = recipientProfile?.display_name || 'Onbekend';
+        const senderName = profile?.display_name || 'Onbekend';
+        const propertyTitle = property?.title || 'Eigendom';
         
-        if (!messageData.recipient_email) {
+        console.log('📧 Attempting to send email notification to:', recipientEmail);
+        
+        if (!recipientEmail) {
           console.warn('⚠️ No recipient email found, skipping email notification');
         } else {
           const emailResponse = await fetch('/.netlify/functions/send-message-notification', {
@@ -75,10 +76,10 @@ export class MessageService {
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-              recipient_email: messageData.recipient_email,
-              recipient_name: messageData.recipient_name,
-              sender_name: messageData.sender_name,
-              property_title: messageData.property_title,
+              recipient_email: recipientEmail,
+              recipient_name: recipientName,
+              sender_name: senderName,
+              property_title: propertyTitle,
               subject: messageData.subject,
               message: messageData.message,
               viewing_date: messageData.viewing_date,
