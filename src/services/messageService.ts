@@ -61,26 +61,40 @@ export class MessageService {
 
       // Send email notification to recipient (fire and forget)
       try {
-        await fetch('/.netlify/functions/send-message-notification', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            recipient_email: messageData.recipient_email,
-            recipient_name: messageData.recipient_name,
-            sender_name: messageData.sender_name,
-            property_title: messageData.property_title,
-            subject: messageData.subject,
-            message: messageData.message,
-            viewing_date: messageData.viewing_date,
-            viewing_time: messageData.viewing_time,
-            viewing_notes: messageData.viewing_notes,
-          }),
-        });
+        console.log('📧 Attempting to send email notification to:', messageData.recipient_email);
+        
+        if (!messageData.recipient_email) {
+          console.warn('⚠️ No recipient email found, skipping email notification');
+        } else {
+          const emailResponse = await fetch('/.netlify/functions/send-message-notification', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              recipient_email: messageData.recipient_email,
+              recipient_name: messageData.recipient_name,
+              sender_name: messageData.sender_name,
+              property_title: messageData.property_title,
+              subject: messageData.subject,
+              message: messageData.message,
+              viewing_date: messageData.viewing_date,
+              viewing_time: messageData.viewing_time,
+              viewing_notes: messageData.viewing_notes,
+            }),
+          });
+
+          const emailResult = await emailResponse.json();
+          
+          if (!emailResponse.ok) {
+            console.error('❌ Email notification failed:', emailResult);
+          } else {
+            console.log('✅ Email notification sent successfully:', emailResult);
+          }
+        }
       } catch (emailError) {
         // Don't fail the message sending if email fails
-        console.error('Failed to send email notification:', emailError);
+        console.error('❌ Failed to send email notification:', emailError);
       }
 
       return { success: true, message: result };
