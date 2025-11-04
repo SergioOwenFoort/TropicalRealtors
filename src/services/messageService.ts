@@ -39,9 +39,6 @@ export class MessageService {
         subject: data.subject || `Vraag over: ${property?.title || 'Eigendom'}`,
         message: data.message,
         message_type: data.message_type || 'inquiry',
-        viewing_date: data.viewing_date || null,
-        viewing_time: data.viewing_time || null,
-        viewing_notes: data.viewing_notes || null,
       };
 
       console.log('Attempting to insert message with data:', messageData);
@@ -82,9 +79,9 @@ export class MessageService {
               property_title: propertyTitle,
               subject: messageData.subject,
               message: messageData.message,
-              viewing_date: messageData.viewing_date,
-              viewing_time: messageData.viewing_time,
-              viewing_notes: messageData.viewing_notes,
+              viewing_date: data.viewing_date || null,
+              viewing_time: data.viewing_time || null,
+              viewing_notes: data.viewing_notes || null,
             }),
           });
 
