@@ -13,9 +13,13 @@
 # misc
 .DS_Store
 .env
+.env.*
+!.env.example
+!.env.*.example
 .env.service
 .env.local
 .env.backend
+.env.backup
 .env.development.local
 .env.test.local
 .env.production.local

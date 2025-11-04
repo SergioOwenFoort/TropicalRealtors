@@ -197,7 +197,13 @@ export function emailServicePlugin(): Plugin {
 
               // Import Resend dynamically
               const { Resend } = await import('resend');
-              const resend = new Resend(process.env.VITE_RESEND_API_KEY || 're_7GxDxqAA_7Z952vTSQm9yALuqrv9R8SPo');
+              const resendApiKey = process.env.VITE_RESEND_API_KEY;
+              if (!resendApiKey) {
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: 'Server misconfigured: missing VITE_RESEND_API_KEY' }));
+                return;
+              }
+              const resend = new Resend(resendApiKey);
 
               console.log('📤 Sending email via Resend API...');
 
