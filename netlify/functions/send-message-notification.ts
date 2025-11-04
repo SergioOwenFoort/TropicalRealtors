@@ -180,6 +180,10 @@ Dit is een automatisch gegenereerd bericht van Tropical Realtors.
     `.trim();
 
     // Send email
+    console.log('Attempting to send email from:', `"Tropical Realtors" <no_reply@tropicalrealtors.com>`);
+    console.log('Sending to:', data.recipient_email);
+    console.log('Subject:', `Nieuw bericht: ${data.subject}`);
+    
     const info = await transporter.sendMail({
       from: `"Tropical Realtors" <no_reply@tropicalrealtors.com>`,
       to: data.recipient_email,
@@ -188,7 +192,11 @@ Dit is een automatisch gegenereerd bericht van Tropical Realtors.
       html: emailHtml,
     });
 
-    console.log('Message sent: %s', info.messageId);
+    console.log('✅ Email sent successfully!');
+    console.log('Message ID:', info.messageId);
+    console.log('Response:', info.response);
+    console.log('Accepted:', info.accepted);
+    console.log('Rejected:', info.rejected);
 
     return {
       statusCode: 200,
@@ -196,6 +204,8 @@ Dit is een automatisch gegenereerd bericht van Tropical Realtors.
         success: true,
         message: 'Email notification sent successfully',
         messageId: info.messageId,
+        accepted: info.accepted,
+        rejected: info.rejected,
       }),
     };
   } catch (error) {
