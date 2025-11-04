@@ -30,3 +30,6 @@ yarn-error.log*
 
 # Local Netlify folder
 .netlify
+
+# Security files
+SECURITY_BREACH_NOTICE.md
