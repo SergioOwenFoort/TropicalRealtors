@@ -77,24 +77,41 @@ export function ContactPage() {
         message: sanitizeText(formData.message)
       };
 
-      // Use Netlify Forms - sends to your Netlify dashboard and your email
-      const netlifyFormData = new FormData();
-      netlifyFormData.append('form-name', 'contact');
-      netlifyFormData.append('name', sanitizedData.name);
-      netlifyFormData.append('email', sanitizedData.email);
-      netlifyFormData.append('island', sanitizedData.island);
-      netlifyFormData.append('subject', sanitizedData.subject);
-      netlifyFormData.append('message', sanitizedData.message);
-
-      const response = await fetch('/', {
+      // Send email notification using your custom Netlify function
+      console.log('📧 Sending contact form email...');
+      
+      const emailResponse = await fetch('/.netlify/functions/send-message-notification', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams(netlifyFormData as any).toString(),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          recipient_email: 'info@tropicalrealtors.com', // Your admin email
+          recipient_name: 'Tropical Realtors Admin',
+          sender_name: sanitizedData.name,
+          property_title: `Contactformulier - ${sanitizedData.island}`,
+          subject: sanitizedData.subject,
+          message: `
+Van: ${sanitizedData.name}
+Email: ${sanitizedData.email}
+Eiland: ${sanitizedData.island}
+
+${sanitizedData.message}
+          `.trim(),
+          viewing_date: null,
+          viewing_time: null,
+          viewing_notes: null,
+        }),
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to send message');
+      const emailResult = await emailResponse.json();
+      
+      if (!emailResponse.ok) {
+        console.error('❌ Contact form email failed:', emailResult);
+        throw new Error('Failed to send email');
       }
+      
+      console.log('✅ Contact form email sent successfully:', emailResult);
 
       // Success!
       setSubmitted(true);
